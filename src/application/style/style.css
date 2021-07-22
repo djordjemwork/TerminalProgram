@@ -1,0 +1,14 @@
+.root {
+    -fx-background-color: #E9EEF1;
+    -fx-max-width: 1042px;
+    -fx-min-width: 1042px;
+    -fx-max-height: 720px;
+    -fx-min-height: 720px;
+}
+
+.progress-bar {
+    -fx-indeterminate-bar-escape: true;
+    -fx-indeterminate-bar-flip: false;
+    -fx-indeterminate-bar-animation-time: 1.2;
+    -fx-indeterminate-bar-length: 1050;
+}
