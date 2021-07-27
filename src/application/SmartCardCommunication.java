@@ -176,9 +176,13 @@ public class SmartCardCommunication {
         }
     }
 
-    private List<CardTerminal> getAllTerminals() throws CardException {
-        TerminalFactory tf = TerminalFactory.getDefault();
-        return tf.terminals().list();
+    private List<CardTerminal> getAllTerminals() {
+        try {
+            TerminalFactory tf = TerminalFactory.getDefault();
+            return tf.terminals().list();
+        } catch (CardException ex) {
+            return null;
+        }
     }
 
     public boolean establishSecureChannel(String cardReader) {
@@ -223,27 +227,27 @@ public class SmartCardCommunication {
             CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0x20, 0x00, 0x00, enc);
             ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
             if (responseAPDU.getSW() != 0x9000) {
-                System.out.println((short)responseAPDU.getSW());
+                System.out.println((short) responseAPDU.getSW());
                 if (responseAPDU.getSW() == 0x6B00) {
                     System.out.println("SW wrong P1P2!");
-                }else if (responseAPDU.getSW() == 0x6983) {
+                } else if (responseAPDU.getSW() == 0x6983) {
                     System.out.println("Authentication method blocked! No more remaining retries!");
-                }else if (responseAPDU.getSW() == 0x6982) {
+                } else if (responseAPDU.getSW() == 0x6982) {
                     System.out.println("Pin was not correct!");
-                }else if (responseAPDU.getSW() == 0x63C0) {
+                } else if (responseAPDU.getSW() == 0x63C0) {
                     System.out.println("Verification failed! Card is locked!");
-                }else if (responseAPDU.getSW() == 0x63C1) {
+                } else if (responseAPDU.getSW() == 0x63C1) {
                     System.out.println("Verification failed! One more attempt left!");
-                }else if (responseAPDU.getSW() == 0x63C2) {
+                } else if (responseAPDU.getSW() == 0x63C2) {
                     System.out.println("Verification failed! Two more attempt left!");
-                }else if (responseAPDU.getSW() == 0x6F00) {
+                } else if (responseAPDU.getSW() == 0x6F00) {
                     System.out.println("Required Removing Card! Function not supported");
                 }
                 return false;
             }
             System.out.println(responseAPDU.getSW());
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }

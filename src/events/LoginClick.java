@@ -64,10 +64,10 @@ public class LoginClick implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event) {
         this.actionEvent = event;
-        String pin = password.getText();
-        if (login(pin)) {
-            //switchScene(event);
+        if(cardTerminals.getSelectionModel().getSelectedItem() == null) {
+            return;
         }
+        login();
     }
 
     private void switchScene(ActionEvent event) {
@@ -85,16 +85,14 @@ public class LoginClick implements EventHandler<ActionEvent> {
         }
     }
 
-    private boolean login(String pinString) {
+    private void login() {
         try {
             CardReader.cardReader = cardTerminals.getSelectionModel().getSelectedItem();
-            serviceExample.setPinString(pinString);
+            serviceExample.setPinString(password.getText());
             serviceExample.restart(); //here you start your service
-            return true;
         } catch (Exception ex) {
             showException(ex);
             Logger.getLogger(LoginClick.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
         }
     }
 
