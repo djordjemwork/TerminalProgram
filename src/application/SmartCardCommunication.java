@@ -204,13 +204,11 @@ public class SmartCardCommunication {
             }
             this.secretKey = secretKey;
             this.secureChannelEstablished = true;
-            System.out.println("Successfully established secure channel.");
             return true;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     public boolean verifyPin(String pinString) {

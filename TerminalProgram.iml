@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../jars/bcprov-ext-jdk15on-159.jar!/" />
+          <root url="jar://$MODULE_DIR$/jars/bcprov-ext-jdk15on-159.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +19,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../jars/cert-cvc-1.4.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/jars/cert-cvc-1.4.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +28,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../jars/jmrtd-0.6.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/jars/jmrtd-0.6.7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -37,7 +37,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../jars/scuba-smartcards-0.0.16.jar!/" />
+          <root url="jar://$MODULE_DIR$/jars/scuba-smartcards-0.0.16.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

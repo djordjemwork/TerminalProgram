@@ -3,11 +3,11 @@ package application;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-public class ServiceExample extends Service<String> {
+public class LoginService extends Service<String> {
 
     private String pinString;
 
-    public ServiceExample() {
+    public LoginService() {
 
     }
 
@@ -23,7 +23,7 @@ public class ServiceExample extends Service<String> {
     protected Task<String> createTask() {
         return new Task<String>() {
             @Override
-            protected String call() throws Exception {
+            protected String call() {
                 //DO YOU HARD STUFF HERE
                 SmartCardCommunication communication = SmartCardCommunication.getInstance();
 
@@ -31,6 +31,8 @@ public class ServiceExample extends Service<String> {
                     //System.out.println("Error in establishing secure channel");
                     return "error";
                 }
+                System.out.println("Successfully established secure channel.");
+
                 if (!communication.verifyPin(pinString)) {
                     //System.out.println("Wrong pin, try again");
                     return "error";

@@ -2,13 +2,10 @@ package events;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import application.ServiceExample;
-import application.SmartCardCommunication;
+import application.LoginService;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -24,28 +21,27 @@ import javafx.stage.Stage;
 
 import application.CardReader;
 
-import javax.smartcardio.*;
-
 public class LoginClick implements EventHandler<ActionEvent> {
     private final PasswordField password;
     private final ComboBox<String> cardTerminals;
     private ProgressBar progressBar;
-    private ServiceExample serviceExample;
+    private LoginService loginService;
     private ActionEvent actionEvent;
 
-    public LoginClick(PasswordField password, ComboBox<String> cardTerminals, ProgressBar progressBar, ServiceExample serviceExample) {
+    public LoginClick(PasswordField password, ComboBox<String> cardTerminals, ProgressBar progressBar, LoginService loginService) {
         this.password = password;
         this.cardTerminals = cardTerminals;
         this.progressBar = progressBar;
-        this.serviceExample = serviceExample;
+        this.loginService = loginService;
 
-        progressBar.visibleProperty().bind(serviceExample.runningProperty());
-        serviceExample.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+        this.progressBar.visibleProperty().bind(loginService.runningProperty());
+
+        loginService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
-                String result = serviceExample.getValue();   //here you get the return value of your service
+                String result = loginService.getValue();   //here you get the return value of your service
                 System.out.println(result);
-                if(result.equals("OK"))
+                if (result.equals("OK"))
                     switchScene(actionEvent);
                 else {
                     System.out.println("Wrong pin!!!");
@@ -53,7 +49,7 @@ public class LoginClick implements EventHandler<ActionEvent> {
             }
         });
 
-        serviceExample.setOnFailed(new EventHandler<WorkerStateEvent>() {
+        loginService.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 System.out.println("Failed");
@@ -63,18 +59,23 @@ public class LoginClick implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        this.actionEvent = event;
-        if(cardTerminals.getSelectionModel().getSelectedItem() == null) {
-            return;
+        try {
+            this.actionEvent = event;
+            if (cardTerminals.getSelectionModel().getSelectedItem() == null) {
+                return;
+            }
+            login();
+        } catch (Exception ex) {
+            showException(ex);
+            Logger.getLogger(LoginClick.class.getName()).log(Level.SEVERE, null, ex);
         }
-        login();
+
     }
 
     private void switchScene(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../application/fxml/MainScene.fxml"));
             Parent mainRoot = (Parent) loader.load();
-            //InputStream stream = getClass().getResourceAsStream("/fxml/Scene.fxml");
             Scene mainScene = new Scene(mainRoot);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(mainScene);
@@ -86,14 +87,9 @@ public class LoginClick implements EventHandler<ActionEvent> {
     }
 
     private void login() {
-        try {
-            CardReader.cardReader = cardTerminals.getSelectionModel().getSelectedItem();
-            serviceExample.setPinString(password.getText());
-            serviceExample.restart(); //here you start your service
-        } catch (Exception ex) {
-            showException(ex);
-            Logger.getLogger(LoginClick.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        CardReader.cardReader = cardTerminals.getSelectionModel().getSelectedItem();
+        loginService.setPinString(password.getText());
+        loginService.restart(); //here you start your service
     }
 
     private static void showException(Exception ex) {
