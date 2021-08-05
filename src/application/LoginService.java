@@ -24,7 +24,6 @@ public class LoginService extends Service<String> {
         return new Task<String>() {
             @Override
             protected String call() {
-                //DO YOU HARD STUFF HERE
                 SmartCardCommunication communication = SmartCardCommunication.getInstance();
 
                 if (!communication.establishSecureChannel(CardReader.cardReader)) {
