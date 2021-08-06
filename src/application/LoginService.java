@@ -1,42 +1,43 @@
 package application;
 
+import entity.LoginMessage;
+import entity.StatusCode;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-public class LoginService extends Service<String> {
+public class LoginService extends Service<LoginMessage> {
 
-    private String pinString;
+    private LoginMessage loginMessage;
 
     public LoginService() {
 
     }
 
-    public String getPinString() {
-        return pinString;
+    public LoginMessage getLoginMessage() {
+        return loginMessage;
     }
 
-    public void setPinString(String pinString) {
-        this.pinString = pinString;
+    public void setLoginMessage(LoginMessage loginMessage) {
+        this.loginMessage = loginMessage;
     }
 
     @Override
-    protected Task<String> createTask() {
-        return new Task<String>() {
+    protected Task<LoginMessage> createTask() {
+        return new Task<LoginMessage>() {
             @Override
-            protected String call() {
-                SmartCardCommunication communication = SmartCardCommunication.getInstance();
+            protected LoginMessage call() {
+                try {
+                    SmartCardCommunication communication = SmartCardCommunication.getInstance();
+                    loginMessage.setStatusCode(StatusCode.OK);
 
-                if (!communication.establishSecureChannel(CardReader.cardReader)) {
-                    //System.out.println("Error in establishing secure channel");
-                    return "error";
-                }
-                System.out.println("Successfully established secure channel.");
+                    communication.establishSecureChannel(loginMessage.getCardReader());
+                    communication.verifyPin(loginMessage.getUserPin());
 
-                if (!communication.verifyPin(pinString)) {
-                    //System.out.println("Wrong pin, try again");
-                    return "error";
+                    return loginMessage;
+                }catch (Exception e) {
+
                 }
-                return "OK";
+                return loginMessage;
             }
         };
     }

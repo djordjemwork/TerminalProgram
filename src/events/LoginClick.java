@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import application.LoginService;
+import entity.LoginMessage;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -64,7 +65,13 @@ public class LoginClick implements EventHandler<ActionEvent> {
             if (cardTerminals.getSelectionModel().getSelectedItem() == null) {
                 return;
             }
-            login();
+            CardReader.cardReader = cardTerminals.getSelectionModel().getSelectedItem();
+            LoginMessage loginMessage = new LoginMessage();
+            loginMessage.setCardReader(cardTerminals.getSelectionModel().getSelectedItem());
+            loginMessage.setUserPin(password.getText());
+
+            loginService.setLoginMessage(loginMessage);
+            loginService.restart();
         } catch (Exception ex) {
             showException(ex);
             Logger.getLogger(LoginClick.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,12 +91,6 @@ public class LoginClick implements EventHandler<ActionEvent> {
             showException(ex);
             Logger.getLogger(LoginClick.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private void login() {
-        CardReader.cardReader = cardTerminals.getSelectionModel().getSelectedItem();
-        loginService.setPinString(password.getText());
-        loginService.restart(); //here you start your service
     }
 
     private static void showException(Exception ex) {
