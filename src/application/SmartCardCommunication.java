@@ -1,5 +1,6 @@
 package application;
 
+import application.exceptions.CardInitException;
 import javafx.scene.control.ComboBox;
 import org.jmrtd.lds.PACEInfo;
 
@@ -42,7 +43,7 @@ public class SmartCardCommunication {
         this.secureChannelEstablished = secureChannelEstablished;
     }
 
-    public void setCardTerminal(String cardTerminal) throws CardException {
+    public void setCardTerminal(String cardTerminal) {
         List<CardTerminal> terminals = getAllTerminals();
         if (terminals == null) {
             return;
@@ -185,30 +186,25 @@ public class SmartCardCommunication {
         }
     }
 
-    public boolean establishSecureChannel(String cardReader) {
-        try {
-            setCardTerminal(cardReader);
-            if (cardTerminal == null) {
-                return false;
-            }
-            if (!selectApplet()) {
-                System.out.println("Error in selecting Applet");
-                return false;
-            } else {
-                System.out.println("Applet selected");
-            }
-
-            SecretKey secretKey = getSymmetricKey();
-            if (secretKey == null) {
-                return false;
-            }
-            this.secretKey = secretKey;
-            this.secureChannelEstablished = true;
-            return true;
-
-        } catch (Exception e) {
-            return false;
+    public void establishSecureChannel(String cardReader) throws CardInitException, CardException {
+        setCardTerminal(cardReader);
+        if (cardTerminal == null) {
+            throw new CardInitException("Error Initalization! CardReader is not Initialized");
         }
+        if (!selectApplet()) {
+            System.out.println("Error in selecting Applet");
+            return;
+        } else {
+            System.out.println("Applet selected");
+        }
+
+        SecretKey secretKey = getSymmetricKey();
+        if (secretKey == null) {
+            return;
+        }
+        this.secretKey = secretKey;
+        this.secureChannelEstablished = true;
+
     }
 
     public boolean verifyPin(String pinString) {
