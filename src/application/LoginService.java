@@ -34,7 +34,7 @@ public class LoginService extends Service<LoginMessage> {
                     communication.verifyPin(loginMessage.getUserPin());
 
                     return loginMessage;
-                }catch (Exception e) {
+                } catch (Exception e) {
 
                 }
                 return loginMessage;

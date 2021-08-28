@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import application.LoginService;
 import entity.LoginMessage;
+import entity.StatusCode;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -40,9 +41,9 @@ public class LoginClick implements EventHandler<ActionEvent> {
         loginService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
-                String result = loginService.getValue();   //here you get the return value of your service
-                System.out.println(result);
-                if (result.equals("OK"))
+                LoginMessage result = loginService.getValue();   //here you get the return value of your service
+                System.out.println(result.getStatusCode());
+                if (result.getStatusCode() == StatusCode.OK)
                     switchScene(actionEvent);
                 else {
                     System.out.println("Wrong pin!!!");
