@@ -5,7 +5,7 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import application.LoginService;
+import application.services.LoginService;
 import entity.LoginMessage;
 import entity.StatusCode;
 import javafx.concurrent.WorkerStateEvent;
@@ -43,6 +43,7 @@ public class LoginClick implements EventHandler<ActionEvent> {
             public void handle(WorkerStateEvent workerStateEvent) {
                 LoginMessage result = loginService.getValue();   //here you get the return value of your service
                 System.out.println(result.getStatusCode());
+                System.out.println("Response: " + result.getStatusCode());
                 if (result.getStatusCode() == StatusCode.OK)
                     switchScene(actionEvent);
                 else {

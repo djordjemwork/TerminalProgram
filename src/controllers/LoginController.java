@@ -1,6 +1,6 @@
 package controllers;
 
-import application.LoginService;
+import application.services.LoginService;
 import application.SmartCardCommunication;
 import javafx.fxml.Initializable;
 import events.LoginClick;
