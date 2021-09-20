@@ -56,7 +56,8 @@ public class LoginClick implements EventHandler<ActionEvent> {
         loginService.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
-                System.out.println("Failed");
+                System.out.println("Failed: " + workerStateEvent.getSource().getException().getLocalizedMessage());
+                //showException((Exception) workerStateEvent.getSource().getException());
             }
         });
     }

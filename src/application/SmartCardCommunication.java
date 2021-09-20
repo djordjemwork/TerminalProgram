@@ -56,7 +56,7 @@ public class SmartCardCommunication {
         }
     }
 
-    public SecretKey getSymmetricKey() {
+    public SecretKey getSymmetricKey() throws Exception {
         try {
             Card connection = cardTerminal.connect("T=1");
             CardChannel cs = connection.getBasicChannel();
@@ -141,33 +141,31 @@ public class SmartCardCommunication {
             this.secureChannelEstablished = true;
             return sKeyS;
         } catch (Exception e) {
-            return null;
+            throw new Exception(e);
         }
     }
 
-    private byte[] encrypt(byte[] message, SecretKey sKey) {
+    private byte[] encrypt(byte[] message, SecretKey sKey) throws Exception {
         try {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, sKey);
             return cipher.doFinal(message);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+            throw new Exception(ex);
         }
     }
 
-    private byte[] decrypt(byte[] encrypted, SecretKey sKey) {
+    private byte[] decrypt(byte[] encrypted, SecretKey sKey) throws Exception {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, sKey);
             return cipher.doFinal(encrypted);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+            throw new Exception(ex);
         }
     }
 
-    public void loadCardReaders(ComboBox<String> cardReaders) throws CardException {
+    public void loadCardReaders(ComboBox<String> cardReaders) {
         List<CardTerminal> terminals = getAllTerminals();
         if (terminals == null)
             return;
@@ -186,9 +184,8 @@ public class SmartCardCommunication {
         }
     }
 
-    public void establishSecureChannel(String cardReader)  {
+    public void establishSecureChannel() throws Exception {
         try {
-            setCardTerminal(cardReader);
             if (cardTerminal == null) {
                 throw new CardInitException("Error Initalization! CardReader is not Initialized");
             }
@@ -207,12 +204,12 @@ public class SmartCardCommunication {
             this.secureChannelEstablished = true;
 
         }catch (Exception e) {
-
+            throw new Exception(e);
         }
 
     }
 
-    public boolean verifyPin(String pinString) {
+    public void verifyPin(String pinString) throws Exception {
         try {
             Card connection = cardTerminal.connect("T=1");
             CardChannel cs = connection.getBasicChannel();
@@ -242,12 +239,10 @@ public class SmartCardCommunication {
                 } else if (responseAPDU.getSW() == 0x6F00) {
                     System.out.println("Required Removing Card! Function not supported");
                 }
-                return false;
             }
             System.out.println(responseAPDU.getSW());
-            return true;
         } catch (Exception e) {
-            return false;
+            throw new Exception(e);
         }
     }
 
