@@ -186,24 +186,29 @@ public class SmartCardCommunication {
         }
     }
 
-    public void establishSecureChannel(String cardReader) throws CardInitException, CardException {
-        setCardTerminal(cardReader);
-        if (cardTerminal == null) {
-            throw new CardInitException("Error Initalization! CardReader is not Initialized");
-        }
-        if (!selectApplet()) {
-            System.out.println("Error in selecting Applet");
-            return;
-        } else {
-            System.out.println("Applet selected");
-        }
+    public void establishSecureChannel(String cardReader)  {
+        try {
+            setCardTerminal(cardReader);
+            if (cardTerminal == null) {
+                throw new CardInitException("Error Initalization! CardReader is not Initialized");
+            }
+            if (!selectApplet()) {
+                System.out.println("Error in selecting Applet");
+                return;
+            } else {
+                System.out.println("Applet selected");
+            }
 
-        SecretKey secretKey = getSymmetricKey();
-        if (secretKey == null) {
-            return;
+            SecretKey secretKey = getSymmetricKey();
+            if (secretKey == null) {
+                return;
+            }
+            this.secretKey = secretKey;
+            this.secureChannelEstablished = true;
+
+        }catch (Exception e) {
+
         }
-        this.secretKey = secretKey;
-        this.secureChannelEstablished = true;
 
     }
 

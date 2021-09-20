@@ -27,17 +27,13 @@ public class LoginService extends Service<LoginMessage> {
         return new Task<LoginMessage>() {
             @Override
             protected LoginMessage call() {
-                try {
-                    SmartCardCommunication communication = SmartCardCommunication.getInstance();
-                    loginMessage.setStatusCode(StatusCode.OK);
 
-                    communication.establishSecureChannel(loginMessage.getCardReader());
-                    communication.verifyPin(loginMessage.getUserPin());
+                SmartCardCommunication communication = SmartCardCommunication.getInstance();
+                loginMessage.setStatusCode(StatusCode.OK);
 
-                    return loginMessage;
-                } catch (Exception e) {
+                communication.establishSecureChannel(loginMessage.getCardReader());
+                communication.verifyPin(loginMessage.getUserPin());
 
-                }
                 return loginMessage;
             }
         };

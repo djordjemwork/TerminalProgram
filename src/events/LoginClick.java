@@ -44,6 +44,7 @@ public class LoginClick implements EventHandler<ActionEvent> {
                 LoginMessage result = loginService.getValue();   //here you get the return value of your service
                 System.out.println(result.getStatusCode());
                 System.out.println("Response: " + result.getStatusCode());
+
                 if (result.getStatusCode() == StatusCode.OK)
                     switchScene(actionEvent);
                 else {
