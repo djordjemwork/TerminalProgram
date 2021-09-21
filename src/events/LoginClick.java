@@ -57,7 +57,11 @@ public class LoginClick implements EventHandler<ActionEvent> {
             @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 System.out.println("Failed: " + workerStateEvent.getSource().getException().getLocalizedMessage());
-                //showException((Exception) workerStateEvent.getSource().getException());
+                System.out.println(progressBar.visibleProperty().toString());
+
+                //progressBar.setVisible(false);
+
+                showException((Exception) workerStateEvent.getSource().getException());
             }
         });
     }
@@ -125,6 +129,6 @@ public class LoginClick implements EventHandler<ActionEvent> {
 
         alert.getDialogPane().setExpandableContent(expContent);
 
-        alert.showAndWait();
+        alert.show();
     }
 }
