@@ -35,35 +35,21 @@ public class LoginClick implements EventHandler<ActionEvent> {
         this.cardTerminals = cardTerminals;
         this.progressBar = progressBar;
         this.loginService = loginService;
-
         this.progressBar.visibleProperty().bind(loginService.runningProperty());
 
-        loginService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent workerStateEvent) {
-                LoginMessage result = loginService.getValue();   //here you get the return value of your service
-                System.out.println(result.getStatusCode());
-                System.out.println("Response: " + result.getStatusCode());
+        loginService.setOnSucceeded(workerStateEvent -> {
+            LoginMessage result = loginService.getValue();   //here you get the return value of your service
+            System.out.println(result.getStatusCode());
+            System.out.println("Response: " + result.getStatusCode());
 
-                if (result.getStatusCode() == StatusCode.OK)
-                    switchScene(actionEvent);
-                else {
-                    System.out.println("Wrong pin!!!");
-                }
+            if (result.getStatusCode() == StatusCode.OK)
+                switchScene(actionEvent);
+            else {
+                System.out.println("Wrong pin!!!");
             }
         });
 
-        loginService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent workerStateEvent) {
-                System.out.println("Failed: " + workerStateEvent.getSource().getException().getLocalizedMessage());
-                System.out.println(progressBar.visibleProperty().toString());
-
-                //progressBar.setVisible(false);
-
-                showException((Exception) workerStateEvent.getSource().getException());
-            }
-        });
+        loginService.setOnFailed(workerStateEvent -> showException((Exception) workerStateEvent.getSource().getException()));
     }
 
     @Override

@@ -22,14 +22,13 @@ public class LoginController implements Initializable {
     private ComboBox<String> cardReaders;
     @FXML
     private ProgressBar progressBar;
-    private LoginService loginService;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
             SmartCardCommunication communication = SmartCardCommunication.getInstance();
             communication.loadCardReaders(cardReaders);
-            loginService = new LoginService();
+            LoginService loginService = new LoginService();
             buttonLogin.setOnAction(new LoginClick(password, cardReaders, progressBar, loginService));
         } catch (Exception ex) {
             Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
