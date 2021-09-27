@@ -55,10 +55,11 @@ public class LoginClick implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event) {
         try {
-            this.actionEvent = event;
             if (cardTerminals.getSelectionModel().getSelectedItem() == null) {
                 return;
             }
+            this.actionEvent = event;
+
             CardReader.cardReader = cardTerminals.getSelectionModel().getSelectedItem();
             LoginMessage loginMessage = new LoginMessage();
             loginMessage.setCardReader(cardTerminals.getSelectionModel().getSelectedItem());
