@@ -12,3 +12,7 @@
     -fx-indeterminate-bar-animation-time: 1.2;
     -fx-indeterminate-bar-length: 1050;
 }
+
+.btnAddNew {
+    -fx-padding: 10 20 10 20;
+}
