@@ -2,6 +2,7 @@ package controllers;
 
 import application.SmartCardCommunication;
 import entity.UserAccount;
+import events.SaveToCardClick;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,8 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
 import java.net.URL;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
 
@@ -76,6 +76,16 @@ public class MainController implements Initializable {
                 });
                 dialog.showAndWait();
             });
+
+            btnDeleteAccount.setOnAction(event -> {
+                ObservableList<UserAccount> sel, items;
+                items = tableUserAccounts.getItems();
+                sel = tableUserAccounts.getSelectionModel().getSelectedItems();
+                for (UserAccount m : sel)
+                    items.remove(m);
+            });
+
+            btnSaveToCard.setOnAction(new SaveToCardClick());
 
         } catch (Exception ex) {
 
