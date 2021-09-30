@@ -52,7 +52,7 @@
                 <children>
                     <HBox prefHeight="15.0" prefWidth="1042.0">
                         <children>
-                            <ProgressBar maxHeight="15" minHeight="15" prefHeight="15" prefWidth="1055.0" progress="0.0" visible="false" />
+                            <ProgressBar fx:id="progressBarMain" styleClass="progress-bar" maxHeight="15" minHeight="15" prefHeight="15" prefWidth="1055.0" />
                         </children>
                     </HBox>
                     <ToolBar prefHeight="97.0" prefWidth="1042.0" style="-fx-background-color: none">

@@ -37,8 +37,8 @@ public class LoginClick implements EventHandler<ActionEvent> {
         this.loginService = loginService;
         this.progressBar.visibleProperty().bind(loginService.runningProperty());
 
-        loginService.setOnSucceeded(workerStateEvent -> {
-            LoginMessage result = loginService.getValue();   //here you get the return value of your service
+        this.loginService.setOnSucceeded(workerStateEvent -> {
+            LoginMessage result = this.loginService.getValue();   //here you get the return value of your service
             System.out.println(result.getStatusCode());
             System.out.println("Response: " + result.getStatusCode());
 
@@ -49,7 +49,7 @@ public class LoginClick implements EventHandler<ActionEvent> {
             }
         });
 
-        loginService.setOnFailed(workerStateEvent -> showException((Exception) workerStateEvent.getSource().getException()));
+        this.loginService.setOnFailed(workerStateEvent -> showException((Exception) workerStateEvent.getSource().getException()));
     }
 
     @Override

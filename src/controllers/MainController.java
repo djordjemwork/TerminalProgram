@@ -1,6 +1,7 @@
 package controllers;
 
 import application.SmartCardCommunication;
+import application.services.SaveToCardCardService;
 import entity.UserAccount;
 import events.SaveToCardClick;
 import javafx.collections.FXCollections;
@@ -31,6 +32,8 @@ public class MainController implements Initializable {
     private Button btnDeleteAccount;
     @FXML
     private Button btnSaveToCard;
+    @FXML
+    private ProgressBar progressBarMain;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -47,6 +50,7 @@ public class MainController implements Initializable {
             data.add(new UserAccount("test@gmail.com", "12345678"));
             data.add(new UserAccount("skype@gmail.com", "fxffsxxa"));
             tableUserAccounts.setItems(data);
+            tableUserAccounts.getSelectionModel().clearSelection();
 
             btnAddNewAccount.setOnAction(event -> {
                 // Create Dialog form
@@ -85,7 +89,8 @@ public class MainController implements Initializable {
                     items.remove(m);
             });
 
-            btnSaveToCard.setOnAction(new SaveToCardClick());
+            SaveToCardCardService saveToCardCardService = new SaveToCardCardService();
+            btnSaveToCard.setOnAction(new SaveToCardClick(progressBarMain, tableUserAccounts.getItems(), saveToCardCardService));
 
         } catch (Exception ex) {
 
