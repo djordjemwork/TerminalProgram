@@ -30,8 +30,6 @@ public class SaveToCardCardService extends Service<UserAccountMessage> {
                 SmartCardCommunication communication = SmartCardCommunication.getInstance();
                 userAccountMessage.setStatusCode(StatusCode.OK);
 
-
-
                 return userAccountMessage;
             }
         };
