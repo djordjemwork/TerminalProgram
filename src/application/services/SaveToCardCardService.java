@@ -29,7 +29,9 @@ public class SaveToCardCardService extends Service<UserAccountMessage> {
             protected UserAccountMessage call() throws Exception {
                 SmartCardCommunication communication = SmartCardCommunication.getInstance();
                 userAccountMessage.setStatusCode(StatusCode.OK);
-                communication.setCardTerminal(userAccountMessage.getCardReader());
+
+                
+
                 return userAccountMessage;
             }
         };

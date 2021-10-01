@@ -19,7 +19,6 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
     private ProgressBar progressBarMain;
     private List<UserAccount> accountList;
     private SaveToCardCardService saveToCardCardService;
-    private ActionEvent actionEvent;
 
     public SaveToCardClick(ProgressBar progressBarMain, List<UserAccount> accountList, SaveToCardCardService saveToCardCardService) {
         this.progressBarMain = progressBarMain;
@@ -45,10 +44,7 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
     public void handle(ActionEvent event) {
 
         try {
-            this.actionEvent = event;
-
             UserAccountMessage userAccountMessage = new UserAccountMessage();
-
             saveToCardCardService.setUserAccountMessage(userAccountMessage);
             saveToCardCardService.restart();
         } catch (Exception ex) {
