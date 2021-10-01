@@ -2,6 +2,7 @@ package application;
 
 import application.exceptions.CardInitException;
 import entity.StatusCode;
+import entity.UserAccountMessage;
 import javafx.scene.control.ComboBox;
 import org.jmrtd.lds.PACEInfo;
 
@@ -247,6 +248,45 @@ public class SmartCardCommunication {
                 throw new CardException(responseAPDU.toString());
             }
         }
+    }
+
+    public void getUserAccountDataFromCard(UserAccountMessage userAccountMessage) throws CardException, IllegalBlockSizeException,
+            InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+        Card connection = cardTerminal.connect("T=1");
+        CardChannel cs = connection.getBasicChannel();
+        CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xCC, 0x00, 0x00);
+        ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
+
+        if (responseAPDU.getSW() != 0x9000) {
+            if (responseAPDU.getSW() == 0x6982) {
+                userAccountMessage.setStatusCode(StatusCode.UnauthorizedUser);
+                throw new CardException("Unauthorized user!");
+            } else if (responseAPDU.getSW() == 0x6F00) {
+                userAccountMessage.setStatusCode(StatusCode.CardInternalError);
+                throw new CardException("Something went wrong! Internal Error!");
+            } else {
+                userAccountMessage.setStatusCode(StatusCode.CardGenericError);
+                throw new CardException(responseAPDU.toString());
+            }
+        }
+        byte[] dec = decrypt(responseAPDU.getData(), this.secretKey);
+        int len = (dec[0] & 0xff) * 256 + (dec[1] & 0xff);
+        userAccountMessage.setUserAccountList(null);
+        if(len == 0) {
+            return;
+        }
+        byte[] data = new byte[len];
+        System.arraycopy(dec, 2, data, 0, len);
+        int lenUserAccountListData = (data[0] & 0xff) * 256 + (data[1] & 0xff);
+        byte[] userAccountListByte = new byte[lenUserAccountListData];
+        if (lenUserAccountListData > data.length) {
+            userAccountMessage.setStatusCode(StatusCode.WrongLength);
+            throw new CardException("Wrong additional data format on card!");
+        }
+        System.arraycopy(data, 2, userAccountListByte, 0, lenUserAccountListData);
+        String s = new String(userAccountListByte);
+
+        userAccountMessage.setUserAccountList(s);
     }
 
     private boolean selectApplet() throws CardException {
