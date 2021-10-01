@@ -3,17 +3,17 @@ package entity;
 import java.util.List;
 
 public class UserAccountMessage {
-    private List<UserAccount> userAccountList;
+    private String userAccountListJSON;
     private String response;
     private String cardReader;
     private int statusCode;
 
-    public List<UserAccount> getUserAccountList() {
-        return userAccountList;
+    public String getUserAccountList() {
+        return userAccountListJSON;
     }
 
-    public void setUserAccountList(List<UserAccount> userAccountList) {
-        this.userAccountList = userAccountList;
+    public void setUserAccountList(String userAccountListJSON) {
+        this.userAccountListJSON = userAccountListJSON;
     }
 
     public String getResponse() {

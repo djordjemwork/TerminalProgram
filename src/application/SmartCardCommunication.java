@@ -1,17 +1,20 @@
 package application;
 
 import application.exceptions.CardInitException;
+import entity.StatusCode;
 import javafx.scene.control.ComboBox;
 import org.jmrtd.lds.PACEInfo;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.smartcardio.*;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
@@ -141,13 +144,15 @@ public class SmartCardCommunication {
         return sKeyS;
     }
 
-    private byte[] encrypt(byte[] message, SecretKey sKey) throws Exception {
+    private byte[] encrypt(byte[] message, SecretKey sKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, sKey);
         return cipher.doFinal(message);
     }
 
-    private byte[] decrypt(byte[] encrypted, SecretKey sKey) throws Exception {
+    private byte[] decrypt(byte[] encrypted, SecretKey sKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, sKey);
         return cipher.doFinal(encrypted);
@@ -210,6 +215,38 @@ public class SmartCardCommunication {
             }
         }
         System.out.println(responseAPDU.getSW());
+    }
+
+    public void putUserAccountDataToCard(String userAccountDataJSON) throws IllegalBlockSizeException, InvalidKeyException,
+            BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException, CardException {
+
+        Card connection = cardTerminal.connect("T=1");
+        CardChannel cs = connection.getBasicChannel();
+        int le = userAccountDataJSON.getBytes(StandardCharsets.UTF_8).length;
+        byte[] data = new byte[le + 2];
+        data[0] = (byte) ((le >> 0x08) & 0xFF);
+        data[1] = (byte) (le & 0xFF);
+        System.arraycopy(userAccountDataJSON.getBytes("UTF-8"), 0, data, 2, le);
+
+        byte[] enc = new byte[data.length + 2];
+        enc[0] = (byte) ((data.length >> 0x08) & 0xFF);
+        enc[1] = (byte) (data.length & 0xFF);
+        System.arraycopy(data, 0, enc, 2, data.length);
+        enc = encrypt(enc, this.secretKey);
+        CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xDC, 0x00, 0x00, enc);
+        ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
+        if (responseAPDU.getSW() != 0x9000) {
+            if (responseAPDU.getSW() == 0x6982) {
+                //additionalDataMessage.setStatusCode(StatusCode.UnauthorizedUser);
+                throw new CardException("Unauthorized user!");
+            } else if (responseAPDU.getSW() == 0x6F00) {
+                //additionalDataMessage.setStatusCode(StatusCode.CardInternalError);
+                throw new CardException("Something went wrong! Internal Error!");
+            } else {
+                //additionalDataMessage.setStatusCode(StatusCode.GenericError);
+                throw new CardException(responseAPDU.toString());
+            }
+        }
     }
 
     private boolean selectApplet() throws CardException {

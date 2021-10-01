@@ -2,6 +2,7 @@ package events;
 
 import application.CardReader;
 import application.services.SaveToCardCardService;
+import com.google.gson.Gson;
 import entity.LoginMessage;
 import entity.StatusCode;
 import entity.UserAccount;
@@ -45,6 +46,11 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
 
         try {
             UserAccountMessage userAccountMessage = new UserAccountMessage();
+            userAccountMessage.setResponse("OK");
+
+            String userAccountsJSON = new Gson().toJson(accountList);
+
+            userAccountMessage.setUserAccountList(userAccountsJSON);
             saveToCardCardService.setUserAccountMessage(userAccountMessage);
             saveToCardCardService.restart();
         } catch (Exception ex) {
