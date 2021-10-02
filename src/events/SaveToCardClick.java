@@ -1,9 +1,7 @@
 package events;
 
-import application.CardReader;
 import application.services.SaveToCardCardService;
 import com.google.gson.Gson;
-import entity.LoginMessage;
 import entity.StatusCode;
 import entity.UserAccount;
 import entity.UserAccountMessage;
