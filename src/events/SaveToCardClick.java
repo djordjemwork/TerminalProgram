@@ -1,7 +1,11 @@
 package events;
 
+import application.CardReader;
+import application.Util;
 import application.services.SaveToCardCardService;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import entity.LoginMessage;
 import entity.StatusCode;
 import entity.UserAccount;
 import entity.UserAccountMessage;
@@ -9,6 +13,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ProgressBar;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,8 +22,8 @@ import java.util.logging.Logger;
 public class SaveToCardClick implements EventHandler<ActionEvent> {
 
     private ProgressBar progressBarMain;
-    private List<UserAccount> accountList;
-    private SaveToCardCardService saveToCardCardService;
+    private final List<UserAccount> accountList;
+    private final SaveToCardCardService saveToCardCardService;
 
     public SaveToCardClick(ProgressBar progressBarMain, List<UserAccount> accountList, SaveToCardCardService saveToCardCardService) {
         this.progressBarMain = progressBarMain;
@@ -27,12 +33,8 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
 
         this.saveToCardCardService.setOnSucceeded(workerStateEvent -> {
             UserAccountMessage result = this.saveToCardCardService.getValue();   //here you get the return value of your service
-            System.out.println(result.getStatusCode());
-            System.out.println("Response: " + result.getStatusCode());
-
-            if (result.getStatusCode() == StatusCode.OK) {;
-            } else {
-                System.out.println("Wrong pin!!!");
+            if(result.getStatusCode() == StatusCode.OK) {
+                Util.showSuccessfulDialog("Data has been saved successfully");
             }
         });
 
@@ -54,6 +56,7 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
         } catch (Exception ex) {
             //showException(ex);
             Logger.getLogger(LoginClick.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error handle");
         }
 
     }

@@ -32,10 +32,10 @@
                     <RowConstraints maxHeight="109.0" minHeight="0.0" prefHeight="53.0" vgrow="SOMETIMES" />
                 </rowConstraints>
                 <children>
-                    <TableView editable="true" fx:id="tableUserAccounts" prefHeight="513.0" prefWidth="642.0" GridPane.rowIndex="1">
+                    <TableView style="-fx-focus-color: transparent;" editable="true" fx:id="tableUserAccounts" prefHeight="513.0" prefWidth="642.0" GridPane.rowIndex="1">
                         <columns>
-                            <TableColumn fx:id="columnUserName" maxWidth="321" minWidth="321" prefWidth="321" style="-fx-alignment: CENTER" text="Username" />
-                            <TableColumn fx:id="columnPassword" maxWidth="321" minWidth="321" prefWidth="321" style="-fx-alignment: CENTER" text="Password" />
+                            <TableColumn fx:id="columnUserName" maxWidth="321" minWidth="321" style="-fx-alignment: CENTER" text="Username" />
+                            <TableColumn fx:id="columnPassword" maxWidth="330" minWidth="330" style="-fx-alignment: CENTER" text="Password" />
                         </columns>
                     </TableView>
                 </children>
