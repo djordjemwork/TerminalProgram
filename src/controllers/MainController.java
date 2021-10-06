@@ -1,11 +1,14 @@
 package controllers;
 
 import application.SmartCardCommunication;
+import application.services.ReadDataFromCardService;
 import application.services.SaveToCardCardService;
 import entity.UserAccount;
+import events.ReadDataFromCard;
 import events.SaveToCardClick;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -45,11 +48,6 @@ public class MainController implements Initializable {
             columnPassword.setCellFactory(TextFieldTableCell.forTableColumn());
             columnPassword.setOnEditCommit(event -> event.getRowValue().setPassword(event.getNewValue()));
 
-            ObservableList<UserAccount> data = FXCollections.observableArrayList();
-            data.add(new UserAccount("djordje0065@gmail.com", "123pass"));
-            data.add(new UserAccount("test@gmail.com", "12345678"));
-            data.add(new UserAccount("skype@gmail.com", "fxffsxxa"));
-            tableUserAccounts.setItems(data);
             tableUserAccounts.getSelectionModel().clearSelection();
 
             btnAddNewAccount.setOnAction(event -> {
@@ -89,8 +87,14 @@ public class MainController implements Initializable {
                     items.remove(m);
             });
 
+
             SaveToCardCardService saveToCardCardService = new SaveToCardCardService();
             btnSaveToCard.setOnAction(new SaveToCardClick(progressBarMain, tableUserAccounts.getItems(), saveToCardCardService));
+
+            ReadDataFromCardService readDataFromCardService = new ReadDataFromCardService();
+            ReadDataFromCard readDataFromCard = new ReadDataFromCard(readDataFromCardService, tableUserAccounts);
+            readDataFromCard.handle(new ActionEvent());
+
 
         } catch (Exception ex) {
 
