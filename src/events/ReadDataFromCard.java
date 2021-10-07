@@ -16,13 +16,11 @@ import java.util.logging.Logger;
 
 public class ReadDataFromCard implements EventHandler<ActionEvent> {
 
-    private ReadDataFromCardService readDataFromCardService;
-    private TableView<UserAccount> tableUserAccounts;
+    private final ReadDataFromCardService readDataFromCardService;
 
 
     public ReadDataFromCard(ReadDataFromCardService readDataFromCardService, TableView<UserAccount> tableUserAccounts) {
         this.readDataFromCardService = readDataFromCardService;
-        this.tableUserAccounts = tableUserAccounts;
 
         this.readDataFromCardService.setOnSucceeded(workerStateEvent -> {
             UserAccountMessage result = this.readDataFromCardService.getValue();
@@ -32,6 +30,7 @@ public class ReadDataFromCard implements EventHandler<ActionEvent> {
                 List<UserAccount> userAccountListTest = new Gson().fromJson(userAccountJSON, new TypeToken<List<UserAccount>>() {}.getType());
 
                 tableUserAccounts.getItems().addAll(userAccountListTest);
+                tableUserAccounts.getSelectionModel().clearSelection();
             }
         });
 

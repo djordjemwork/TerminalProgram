@@ -1,12 +1,10 @@
 package controllers;
 
-import application.SmartCardCommunication;
 import application.services.ReadDataFromCardService;
 import application.services.SaveToCardCardService;
 import entity.UserAccount;
 import events.ReadDataFromCard;
 import events.SaveToCardClick;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -48,7 +46,6 @@ public class MainController implements Initializable {
             columnPassword.setCellFactory(TextFieldTableCell.forTableColumn());
             columnPassword.setOnEditCommit(event -> event.getRowValue().setPassword(event.getNewValue()));
 
-            tableUserAccounts.getSelectionModel().clearSelection();
 
             btnAddNewAccount.setOnAction(event -> {
                 // Create Dialog form

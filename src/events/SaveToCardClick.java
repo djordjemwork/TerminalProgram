@@ -1,39 +1,31 @@
 package events;
 
-import application.CardReader;
 import application.Util;
 import application.services.SaveToCardCardService;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import entity.LoginMessage;
 import entity.StatusCode;
 import entity.UserAccount;
 import entity.UserAccountMessage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ProgressBar;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SaveToCardClick implements EventHandler<ActionEvent> {
 
-    private ProgressBar progressBarMain;
     private final List<UserAccount> accountList;
     private final SaveToCardCardService saveToCardCardService;
 
     public SaveToCardClick(ProgressBar progressBarMain, List<UserAccount> accountList, SaveToCardCardService saveToCardCardService) {
-        this.progressBarMain = progressBarMain;
         this.accountList = accountList;
         this.saveToCardCardService = saveToCardCardService;
-        this.progressBarMain.visibleProperty().bind(saveToCardCardService.runningProperty());
+        progressBarMain.visibleProperty().bind(saveToCardCardService.runningProperty());
 
         this.saveToCardCardService.setOnSucceeded(workerStateEvent -> {
             UserAccountMessage result = this.saveToCardCardService.getValue();   //here you get the return value of your service
-            if(result.getStatusCode() == StatusCode.OK) {
+            if (result.getStatusCode() == StatusCode.OK) {
                 Util.showSuccessfulDialog("Data has been saved successfully");
             }
         });
