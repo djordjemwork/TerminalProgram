@@ -47,7 +47,6 @@ public class SaveToCardCardService extends Service<UserAccountMessage> {
                 userAccountMessage.setStatusCode(StatusCode.OK);
                 communication.putUserAccountDataToCard(userAccountMessage.getUserAccountList());
 
-                communication.getUserAccountDataFromCard(userAccountMessage);
                 return userAccountMessage;
             }
         };
