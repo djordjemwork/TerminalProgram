@@ -9,6 +9,8 @@ import entity.UserAccountMessage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableView;
+
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,8 +20,8 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
     private final List<UserAccount> accountList;
     private final SaveToCardCardService saveToCardCardService;
 
-    public SaveToCardClick(ProgressBar progressBarMain, List<UserAccount> accountList, SaveToCardCardService saveToCardCardService) {
-        this.accountList = accountList;
+    public SaveToCardClick(ProgressBar progressBarMain, TableView<UserAccount> tableUserAccounts, SaveToCardCardService saveToCardCardService) {
+        this.accountList = tableUserAccounts.getItems();
         this.saveToCardCardService = saveToCardCardService;
         progressBarMain.visibleProperty().bind(saveToCardCardService.runningProperty());
 

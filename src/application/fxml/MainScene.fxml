@@ -48,7 +48,7 @@
                     </TableView>
                     <HBox prefHeight="100.0" prefWidth="200.0">
                         <children>
-                            <TextField prefHeight="25.0" prefWidth="205.0"/>
+                            <TextField fx:id="txtSearchTable" prefHeight="25.0" prefWidth="205.0"/>
                             <Region prefHeight="100.0" prefWidth="30"/>
                             <Button mnemonicParsing="false" text="Search"/>
                             <Region prefHeight="100.0" prefWidth="10"/>
@@ -83,9 +83,6 @@
                             <Pane HBox.hgrow="ALWAYS"/>
                             <Button fx:id="btnDeleteAccount" mnemonicParsing="false" prefHeight="40.0" prefWidth="160.0"
                                     text="DELETE"/>
-                            <Pane HBox.hgrow="ALWAYS"/>
-                            <Button fx:id="btnReadFromCard" mnemonicParsing="false" prefHeight="40.0" prefWidth="160.0"
-                                    text="READ FROM CARD"/>
                             <Pane HBox.hgrow="ALWAYS"/>
                             <Button fx:id="btnSaveToCard" mnemonicParsing="false" prefHeight="40.0" prefWidth="160.0"
                                     text="SAVE TO CARD"/>
