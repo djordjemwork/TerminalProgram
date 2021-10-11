@@ -1,6 +1,5 @@
 package controllers;
 
-import application.SmartCardCommunication;
 import application.services.ReadDataFromCardService;
 import application.services.SaveToCardCardService;
 import entity.UserAccount;
@@ -8,6 +7,9 @@ import events.ReadDataFromCard;
 import events.SaveToCardClick;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
 import javafx.util.Pair;
 
 import java.net.URL;
@@ -37,6 +40,8 @@ public class MainController implements Initializable {
     private Button btnSaveToCard;
     @FXML
     private ProgressBar progressBarMain;
+    @FXML
+    private TextField txtSearchTable;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -48,7 +53,17 @@ public class MainController implements Initializable {
             columnPassword.setCellFactory(TextFieldTableCell.forTableColumn());
             columnPassword.setOnEditCommit(event -> event.getRowValue().setPassword(event.getNewValue()));
 
-            tableUserAccounts.getSelectionModel().clearSelection();
+            ReadDataFromCardService readDataFromCardService = new ReadDataFromCardService();
+            ReadDataFromCard readDataFromCard = new ReadDataFromCard(readDataFromCardService, tableUserAccounts);
+            readDataFromCard.handle(new ActionEvent());
+
+            btnDeleteAccount.setOnAction(event -> {
+                ObservableList<UserAccount> sel, items;
+                items = tableUserAccounts.getItems();
+                sel = tableUserAccounts.getSelectionModel().getSelectedItems();
+                for (UserAccount m : sel)
+                    items.remove(m);
+            });
 
             btnAddNewAccount.setOnAction(event -> {
                 // Create Dialog form
@@ -72,28 +87,28 @@ public class MainController implements Initializable {
 
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == okButtonType) {
-                        tableUserAccounts.getItems().add(new UserAccount(txtUserName.getText(), txtPassword.getText()));
+                        tableUserAccounts.getItems().add(new UserAccount(txtUserName.getText(), txtPassword.getText(), false));
                     }
                     return null;
                 });
                 dialog.showAndWait();
             });
 
-            btnDeleteAccount.setOnAction(event -> {
-                ObservableList<UserAccount> sel, items;
-                items = tableUserAccounts.getItems();
-                sel = tableUserAccounts.getSelectionModel().getSelectedItems();
-                for (UserAccount m : sel)
-                    items.remove(m);
-            });
-
-
             SaveToCardCardService saveToCardCardService = new SaveToCardCardService();
-            btnSaveToCard.setOnAction(new SaveToCardClick(progressBarMain, tableUserAccounts.getItems(), saveToCardCardService));
+            btnSaveToCard.setOnAction(new SaveToCardClick(progressBarMain, tableUserAccounts, saveToCardCardService));
 
-            ReadDataFromCardService readDataFromCardService = new ReadDataFromCardService();
-            ReadDataFromCard readDataFromCard = new ReadDataFromCard(readDataFromCardService, tableUserAccounts);
-            readDataFromCard.handle(new ActionEvent());
+            tableUserAccounts.setRowFactory(tv -> new TableRow<UserAccount>() {
+                @Override
+                protected void updateItem(UserAccount item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || item.getUsername() == null)
+                        setStyle("");
+                    else if (item.getUsername().equals("prag"))
+                        setStyle("-fx-text-background-color: red;");
+                    else
+                        setStyle("");
+                }
+            });
 
 
         } catch (Exception ex) {

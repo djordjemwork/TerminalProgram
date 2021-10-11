@@ -6,36 +6,44 @@ import com.google.gson.reflect.TypeToken;
 import entity.StatusCode;
 import entity.UserAccount;
 import entity.UserAccountMessage;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.TableView;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ReadDataFromCard implements EventHandler<ActionEvent> {
 
-    private ReadDataFromCardService readDataFromCardService;
-    private TableView<UserAccount> tableUserAccounts;
-
+    private final ReadDataFromCardService readDataFromCardService;
+    private List<UserAccount> userAccountList;
 
     public ReadDataFromCard(ReadDataFromCardService readDataFromCardService, TableView<UserAccount> tableUserAccounts) {
         this.readDataFromCardService = readDataFromCardService;
-        this.tableUserAccounts = tableUserAccounts;
-
         this.readDataFromCardService.setOnSucceeded(workerStateEvent -> {
             UserAccountMessage result = this.readDataFromCardService.getValue();
             System.out.println("Response read from card: " + result.getStatusCode());
-            if(result.getStatusCode() == StatusCode.OK) {
+            if (result.getStatusCode() == StatusCode.OK) {
                 String userAccountJSON = result.getUserAccountList();
-                List<UserAccount> userAccountListTest = new Gson().fromJson(userAccountJSON, new TypeToken<List<UserAccount>>() {}.getType());
-
+                List<UserAccount> userAccountListTest = new Gson().fromJson(userAccountJSON, new TypeToken<List<UserAccount>>() {
+                }.getType());
                 tableUserAccounts.getItems().addAll(userAccountListTest);
+                tableUserAccounts.getSelectionModel().clearSelection();
             }
         });
 
-        this.readDataFromCardService.setOnFailed(workerStateEvent -> System.out.println("Error"));
+        this.readDataFromCardService.setOnFailed(workerStateEvent -> {
+            System.out.println("error");
+        });
 
     }
 
