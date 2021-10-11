@@ -93,7 +93,7 @@
                     </GridPane>
                     <HBox fx:id="optionaHbox" prefHeight="100.0" prefWidth="200.0" styleClass="headerline" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                         <children>
-                            <ProgressBar fx:id="progressBar" maxHeight="15.0" maxWidth="1055.0" minHeight="15.0" minWidth="1055.0" prefHeight="15.0" prefWidth="1055.0" styleClass="progress-bar" />
+                            <ProgressBar visible="false" fx:id="progressBar" maxHeight="15.0" maxWidth="1055.0" minHeight="15.0" minWidth="1055.0" prefHeight="15.0" prefWidth="1055.0" styleClass="progress-bar" />
                         </children>
                     </HBox>
                     <GridPane GridPane.columnIndex="1" GridPane.rowIndex="4">
