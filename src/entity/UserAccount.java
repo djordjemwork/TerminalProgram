@@ -1,7 +1,11 @@
 package entity;
 
+import com.google.gson.annotations.Expose;
+
 public class UserAccount {
+    @Expose
     private String username;
+    @Expose
     private String password;
     private boolean savedToCard;
 

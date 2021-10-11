@@ -103,7 +103,7 @@ public class MainController implements Initializable {
                     super.updateItem(item, empty);
                     if (item == null || item.getUsername() == null)
                         setStyle("");
-                    else if (item.getUsername().equals("prag"))
+                    else if (!item.isSavedToCard())
                         setStyle("-fx-text-background-color: red;");
                     else
                         setStyle("");
