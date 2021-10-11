@@ -3,12 +3,10 @@ package entity;
 public class UserAccount {
     private String username;
     private String password;
-    private boolean savedToCard;
 
-    public UserAccount(String username, String password, boolean savedToCard) {
+    public UserAccount(String username, String password) {
         this.username = username;
         this.password = password;
-        this.savedToCard = savedToCard;
     }
 
     public String getUsername() {
@@ -21,14 +19,6 @@ public class UserAccount {
 
     public String getPassword() {
         return password;
-    }
-
-    public boolean isSavedToCard() {
-        return savedToCard;
-    }
-
-    public void setSavedToCard(boolean savedToCard) {
-        this.savedToCard = savedToCard;
     }
 
     public void setPassword(String password) {

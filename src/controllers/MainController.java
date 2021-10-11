@@ -87,7 +87,21 @@ public class MainController implements Initializable {
 
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == okButtonType) {
-                        tableUserAccounts.getItems().add(new UserAccount(txtUserName.getText(), txtPassword.getText(), false));
+                        tableUserAccounts.getItems().add(new UserAccount(txtUserName.getText(), txtPassword.getText()));
+
+                        tableUserAccounts.setRowFactory(new Callback<TableView<UserAccount>, TableRow<UserAccount>>() {
+                            @Override
+                            public TableRow<UserAccount> call(TableView<UserAccount> tableView) {
+                                final TableRow<UserAccount> row = new TableRow<UserAccount>() {
+                                    @Override
+                                    protected void updateItem(UserAccount person, boolean empty){
+                                        super.updateItem(person, empty);
+                                        System.out.println(person);
+                                    }
+                                };
+                                return row;
+                            }
+                        });
                     }
                     return null;
                 });
@@ -96,19 +110,6 @@ public class MainController implements Initializable {
 
             SaveToCardCardService saveToCardCardService = new SaveToCardCardService();
             btnSaveToCard.setOnAction(new SaveToCardClick(progressBarMain, tableUserAccounts, saveToCardCardService));
-
-            tableUserAccounts.setRowFactory(tv -> new TableRow<UserAccount>() {
-                @Override
-                protected void updateItem(UserAccount item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item == null || item.getUsername() == null)
-                        setStyle("");
-                    else if (item.getUsername().equals("prag"))
-                        setStyle("-fx-text-background-color: red;");
-                    else
-                        setStyle("");
-                }
-            });
 
 
         } catch (Exception ex) {
