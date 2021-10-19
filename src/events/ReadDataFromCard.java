@@ -32,14 +32,15 @@ public class ReadDataFromCard implements EventHandler<ActionEvent> {
         this.readDataFromCardService.setOnSucceeded(workerStateEvent -> {
             UserAccountMessage result = this.readDataFromCardService.getValue();
             System.out.println("Response read from card: " + result.getStatusCode());
-            if (result.getStatusCode() == StatusCode.OK) {
-                String userAccountJSON = result.getUserAccountList();
-                List<UserAccount> userAccountListTest = new Gson().fromJson(userAccountJSON, new TypeToken<List<UserAccount>>() {
-                }.getType());
-                userAccountListTest.forEach(e -> e.setSavedToCard(true));
-                tableUserAccounts.getItems().addAll(userAccountListTest);
-                tableUserAccounts.getSelectionModel().clearSelection();
+            String userAccountJSON = result.getUserAccountList();
+            if (result.getStatusCode() != StatusCode.OK || userAccountJSON == null || userAccountJSON.equals("")) {
+                return;
             }
+            List<UserAccount> userAccountListTest = new Gson().fromJson(userAccountJSON, new TypeToken<List<UserAccount>>() {
+            }.getType());
+            userAccountListTest.forEach(e -> e.setSavedToCard(true));
+            tableUserAccounts.getItems().addAll(userAccountListTest);
+            tableUserAccounts.getSelectionModel().clearSelection();
         });
 
         this.readDataFromCardService.setOnFailed(workerStateEvent -> {
