@@ -9,6 +9,7 @@ import entity.UserAccount;
 import entity.UserAccountMessage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 
@@ -30,6 +31,8 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
             UserAccountMessage result = this.saveToCardCardService.getValue();   //here you get the return value of your service
             if (result.getStatusCode() == StatusCode.OK) {
                 Util.showSuccessfulDialog("Data has been saved successfully");
+                tableUserAccounts.getItems().forEach(e -> e.setSavedToCard(true));
+                tableUserAccounts.getItems().add(new UserAccount(" "," ", true));
             }
         });
 

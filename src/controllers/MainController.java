@@ -2,10 +2,12 @@ package controllers;
 
 import application.services.ReadDataFromCardService;
 import application.services.SaveToCardCardService;
+import com.sun.rowset.internal.Row;
 import entity.UserAccount;
 import events.ReadDataFromCard;
 import events.SaveToCardClick;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -48,21 +50,21 @@ public class MainController implements Initializable {
         try {
             columnUserName.setCellValueFactory(new PropertyValueFactory<>("username"));
             columnUserName.setCellFactory(TextFieldTableCell.forTableColumn());
-            columnUserName.setOnEditCommit(event -> event.getRowValue().setUsername(event.getNewValue()));
             columnPassword.setCellValueFactory(new PropertyValueFactory<>("password"));
             columnPassword.setCellFactory(TextFieldTableCell.forTableColumn());
-            columnPassword.setOnEditCommit(event -> event.getRowValue().setPassword(event.getNewValue()));
 
             ReadDataFromCardService readDataFromCardService = new ReadDataFromCardService();
             ReadDataFromCard readDataFromCard = new ReadDataFromCard(readDataFromCardService, tableUserAccounts);
             readDataFromCard.handle(new ActionEvent());
 
             btnDeleteAccount.setOnAction(event -> {
+                System.out.println("Delete...");
                 ObservableList<UserAccount> sel, items;
                 items = tableUserAccounts.getItems();
                 sel = tableUserAccounts.getSelectionModel().getSelectedItems();
                 for (UserAccount m : sel)
                     items.remove(m);
+                tableUserAccounts.getSelectionModel().clearSelection();
             });
 
             btnAddNewAccount.setOnAction(event -> {
@@ -97,16 +99,19 @@ public class MainController implements Initializable {
             SaveToCardCardService saveToCardCardService = new SaveToCardCardService();
             btnSaveToCard.setOnAction(new SaveToCardClick(progressBarMain, tableUserAccounts, saveToCardCardService));
 
-            tableUserAccounts.setRowFactory(tv -> new TableRow<UserAccount>() {
+
+            tableUserAccounts.setRowFactory((tv) -> new TableRow<UserAccount>() {
                 @Override
-                protected void updateItem(UserAccount item, boolean empty) {
+                public void updateItem(UserAccount item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (item == null || item.getUsername() == null)
+                    if (item != null && item.getUsername().equals(" ")) {
+                        tableUserAccounts.getSelectionModel().select(tableUserAccounts.getItems().get(tableUserAccounts.getItems().size() - 1));
+                        btnDeleteAccount.fire();
+                    }
+                    if (item != null)
                         setStyle("");
-                    else if (!item.isSavedToCard())
+                    if (item != null && !item.isSavedToCard())
                         setStyle("-fx-text-background-color: red;");
-                    else
-                        setStyle("");
                 }
             });
 

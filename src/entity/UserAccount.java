@@ -38,4 +38,13 @@ public class UserAccount {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return "UserAccount{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", savedToCard=" + savedToCard +
+                '}';
+    }
 }
