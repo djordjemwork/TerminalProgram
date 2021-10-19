@@ -22,7 +22,7 @@
                     <RowConstraints maxHeight="109.0" minHeight="0.0" prefHeight="53.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
                 <children>
-                    <TableView editable="true" fx:id="tableUserAccounts" prefHeight="513.0" prefWidth="642.0"
+                    <TableView fx:id="tableUserAccounts" prefHeight="513.0" prefWidth="642.0"
                                GridPane.rowIndex="1">
                         <columns>
                             <TableColumn fx:id="columnUserName" maxWidth="321" minWidth="321" prefWidth="321"
