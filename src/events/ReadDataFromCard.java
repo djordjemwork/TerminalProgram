@@ -39,6 +39,7 @@ public class ReadDataFromCard implements EventHandler<ActionEvent> {
             List<UserAccount> userAccountListTest = new Gson().fromJson(userAccountJSON, new TypeToken<List<UserAccount>>() {
             }.getType());
             userAccountListTest.forEach(e -> e.setSavedToCard(true));
+            userAccountListTest.forEach(e -> e.setPassword("************"));
             tableUserAccounts.getItems().addAll(userAccountListTest);
             tableUserAccounts.getSelectionModel().clearSelection();
         });
