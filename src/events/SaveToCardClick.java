@@ -32,7 +32,7 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
             if (result.getStatusCode() == StatusCode.OK) {
                 Util.showSuccessfulDialog("Data has been saved successfully");
                 tableUserAccounts.getItems().forEach(e -> e.setSavedToCard(true));
-                tableUserAccounts.getItems().add(new UserAccount(" "," ", true));
+                tableUserAccounts.refresh();
             }
         });
 

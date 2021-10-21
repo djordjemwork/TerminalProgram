@@ -6,13 +6,24 @@ public class UserAccount {
     @Expose
     private String username;
     @Expose
+    private String passwordToStore;
+    @Expose
     private String password;
     private boolean savedToCard;
 
-    public UserAccount(String username, String password, boolean savedToCard) {
+    public UserAccount(String username, String password, boolean savedToCard, String passwordToStore) {
         this.username = username;
         this.password = password;
         this.savedToCard = savedToCard;
+        this.passwordToStore = passwordToStore;
+    }
+
+    public String getPasswordToStore() {
+        return passwordToStore;
+    }
+
+    public void setPasswordToStore(String passwordToStore) {
+        this.passwordToStore = passwordToStore;
     }
 
     public String getUsername() {
@@ -27,16 +38,16 @@ public class UserAccount {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public boolean isSavedToCard() {
         return savedToCard;
     }
 
     public void setSavedToCard(boolean savedToCard) {
         this.savedToCard = savedToCard;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Override

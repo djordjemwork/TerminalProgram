@@ -2,16 +2,10 @@ package controllers;
 
 import application.services.ReadDataFromCardService;
 import application.services.SaveToCardCardService;
-import com.sun.rowset.internal.Row;
 import entity.UserAccount;
 import events.ReadDataFromCard;
 import events.SaveToCardClick;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
-import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,11 +14,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
-import javafx.util.Callback;
 import javafx.util.Pair;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
@@ -43,6 +36,8 @@ public class MainController implements Initializable {
     @FXML
     private ProgressBar progressBarMain;
     @FXML
+    private CheckBox checkShowPassword;
+    @FXML
     private TextField txtSearchTable;
 
     @Override
@@ -58,7 +53,6 @@ public class MainController implements Initializable {
             readDataFromCard.handle(new ActionEvent());
 
             btnDeleteAccount.setOnAction(event -> {
-                System.out.println("Delete...");
                 ObservableList<UserAccount> sel, items;
                 items = tableUserAccounts.getItems();
                 sel = tableUserAccounts.getSelectionModel().getSelectedItems();
@@ -89,7 +83,9 @@ public class MainController implements Initializable {
 
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == okButtonType) {
-                        tableUserAccounts.getItems().add(new UserAccount(txtUserName.getText(), txtPassword.getText(), false));
+                        tableUserAccounts.getItems().add(new UserAccount(txtUserName.getText(),
+                                checkShowPassword.isSelected() ? txtPassword.getText() : "************", false,
+                                txtPassword.getText()));
                     }
                     return null;
                 });
@@ -99,22 +95,27 @@ public class MainController implements Initializable {
             SaveToCardCardService saveToCardCardService = new SaveToCardCardService();
             btnSaveToCard.setOnAction(new SaveToCardClick(progressBarMain, tableUserAccounts, saveToCardCardService));
 
-
             tableUserAccounts.setRowFactory((tv) -> new TableRow<UserAccount>() {
                 @Override
                 public void updateItem(UserAccount item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (item != null && item.getUsername().equals(" ")) {
-                        tableUserAccounts.getSelectionModel().select(tableUserAccounts.getItems().get(tableUserAccounts.getItems().size() - 1));
-                        btnDeleteAccount.fire();
-                    }
-                    if (item != null)
+                    if (item != null) {
                         setStyle("");
-                    if (item != null && !item.isSavedToCard())
+                    }
+                    if (item != null && !item.isSavedToCard()) {
                         setStyle("-fx-text-background-color: red;");
+                    }
                 }
             });
 
+            checkShowPassword.setOnAction(event -> {
+                if (checkShowPassword.isSelected()) {
+                    tableUserAccounts.getItems().forEach(e -> e.setPassword(e.getPasswordToStore()));
+                } else {
+                    tableUserAccounts.getItems().forEach(e -> e.setPassword("************"));
+                }
+                tableUserAccounts.refresh();
+            });
 
         } catch (Exception ex) {
 
