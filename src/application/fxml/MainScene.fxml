@@ -31,11 +31,8 @@
                     </columns>
                 </TableView>
                 <HBox prefHeight="100.0" prefWidth="200.0">
-                    <TextField fx:id="txtSearchTable" prefHeight="25.0" prefWidth="205.0"/>
                     <Region prefHeight="100.0" prefWidth="30"/>
-                    <Button mnemonicParsing="false" text="Search"/>
                     <Region prefHeight="100.0" prefWidth="10"/>
-                    <Button mnemonicParsing="false" text="Reset Search"/>
                     <Region prefHeight="100.0" HBox.hgrow="ALWAYS"/>
                     <CheckBox fx:id="checkShowPassword" mnemonicParsing="false" text="Show passwords"/>
                 </HBox>

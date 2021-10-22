@@ -42,6 +42,7 @@ public class ReadDataFromCard implements EventHandler<ActionEvent> {
             userAccountListTest.forEach(e -> e.setPassword("************"));
             tableUserAccounts.getItems().addAll(userAccountListTest);
             tableUserAccounts.getSelectionModel().clearSelection();
+
         });
 
         this.readDataFromCardService.setOnFailed(workerStateEvent -> {
