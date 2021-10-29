@@ -1,17 +1,17 @@
 package controllers;
 
-import application.services.LoginService;
 import application.SmartCardCommunication;
-import javafx.fxml.Initializable;
+import application.services.LoginService;
 import events.LoginClick;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
+
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-
-import javax.smartcardio.CardException;
 
 public class LoginController implements Initializable {
     @FXML
@@ -25,14 +25,10 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            SmartCardCommunication communication = SmartCardCommunication.getInstance();
-            communication.loadCardReaders(cardReaders);
-            LoginService loginService = new LoginService();
-            buttonLogin.setOnAction(new LoginClick(password, cardReaders, progressBar, loginService));
-        } catch (Exception ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        SmartCardCommunication communication = SmartCardCommunication.getInstance();
+        communication.loadCardReaders(cardReaders);
+        buttonLogin.setOnAction(new LoginClick(password, cardReaders, progressBar, new LoginService()));
+
     }
 
 

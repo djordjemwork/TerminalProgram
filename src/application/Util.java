@@ -39,7 +39,7 @@ public class Util {
 
         alert.getDialogPane().setExpandableContent(expContent);
 
-        alert.show();
+        alert.showAndWait();
     }
 
     public static void showSuccessfulDialog(String message) {

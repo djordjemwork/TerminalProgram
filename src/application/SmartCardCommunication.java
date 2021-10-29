@@ -1,6 +1,7 @@
 package application;
 
 import application.exceptions.CardInitException;
+import controllers.LoginController;
 import entity.StatusCode;
 import entity.UserAccountMessage;
 import javafx.scene.control.ComboBox;
@@ -19,6 +20,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class SmartCardCommunication {
@@ -159,14 +162,19 @@ public class SmartCardCommunication {
         return cipher.doFinal(encrypted);
     }
 
-    public void loadCardReaders(ComboBox<String> cardReaders) throws CardException {
-        List<CardTerminal> terminals = getAllTerminals();
-        if (terminals == null)
-            return;
-        for (CardTerminal terminal : terminals) {
-            cardReaders.getItems().add(terminal.toString().split("PC/SC terminal ")[1].trim());
-            cardReaders.setValue(terminal.toString().split("PC/SC terminal ")[1].trim());
+    public void loadCardReaders(ComboBox<String> cardReaders) {
+        try {
+            List<CardTerminal> terminals = getAllTerminals();
+            if (terminals == null)
+                return;
+            for (CardTerminal terminal : terminals) {
+                cardReaders.getItems().add(terminal.toString().split("PC/SC terminal ")[1].trim());
+                cardReaders.setValue(terminal.toString().split("PC/SC terminal ")[1].trim());
+            }
+        } catch (CardException e) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, e);
         }
+
     }
 
     private List<CardTerminal> getAllTerminals() throws CardException {
@@ -269,10 +277,13 @@ public class SmartCardCommunication {
                 throw new CardException(responseAPDU.toString());
             }
         }
+        if (true) {
+            throw new InvalidKeyException("Invalid key");
+        }
         byte[] dec = decrypt(responseAPDU.getData(), this.secretKey);
         int len = (dec[0] & 0xff) * 256 + (dec[1] & 0xff);
         userAccountMessage.setUserAccountList(null);
-        if(len == 0) {
+        if (len == 0) {
             return;
         }
         byte[] data = new byte[len];
