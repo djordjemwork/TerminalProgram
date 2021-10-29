@@ -1,5 +1,6 @@
 package events;
 
+import application.Util;
 import application.services.ReadDataFromCardService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -35,8 +36,7 @@ public class ReadDataFromCard implements EventHandler<ActionEvent> {
         });
 
         this.readDataFromCardService.setOnFailed(workerStateEvent -> {
-            // TODO: Handle exception
-            System.out.println(readDataFromCardService);
+            Util.showException((Exception) workerStateEvent.getSource().getException());
         });
 
     }
@@ -47,6 +47,5 @@ public class ReadDataFromCard implements EventHandler<ActionEvent> {
         userAccountMessage.setResponse("OK");
         readDataFromCardService.setUserAccountMessage(userAccountMessage);
         readDataFromCardService.restart();
-
     }
 }

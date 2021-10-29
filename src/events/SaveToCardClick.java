@@ -34,8 +34,7 @@ public class SaveToCardClick implements EventHandler<ActionEvent> {
         });
 
         this.saveToCardCardService.setOnFailed(workerStateEvent -> {
-            // TODO: Handle exception
-            System.out.println("Error");
+            Util.showException((Exception) workerStateEvent.getSource().getException());
         });
     }
 

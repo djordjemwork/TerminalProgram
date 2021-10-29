@@ -37,8 +37,6 @@ public class MainController implements Initializable {
     private ProgressBar progressBarMain;
     @FXML
     private CheckBox checkShowPassword;
-    @FXML
-    private TextField txtSearchTable;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

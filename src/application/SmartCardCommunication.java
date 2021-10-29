@@ -277,9 +277,6 @@ public class SmartCardCommunication {
                 throw new CardException(responseAPDU.toString());
             }
         }
-        if (true) {
-            throw new InvalidKeyException("Invalid key");
-        }
         byte[] dec = decrypt(responseAPDU.getData(), this.secretKey);
         int len = (dec[0] & 0xff) * 256 + (dec[1] & 0xff);
         userAccountMessage.setUserAccountList(null);
