@@ -28,9 +28,7 @@ public class ReadDataFromCardService extends Service<UserAccountMessage> {
             @Override
             protected UserAccountMessage call() throws Exception {
                 SmartCardCommunication communication = SmartCardCommunication.getInstance();
-                userAccountMessage.setStatusCode(StatusCode.OK);
                 communication.getUserAccountDataFromCard(userAccountMessage);
-
                 return userAccountMessage;
             }
         };

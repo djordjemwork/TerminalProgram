@@ -2,6 +2,7 @@ package application;
 
 import application.exceptions.CardInitException;
 import controllers.LoginController;
+import entity.LoginMessage;
 import entity.StatusCode;
 import entity.UserAccountMessage;
 import javafx.scene.control.ComboBox;
@@ -50,7 +51,8 @@ public class SmartCardCommunication {
         this.secureChannelEstablished = secureChannelEstablished;
     }
 
-    public void setCardTerminal(String cardTerminal) throws CardException {
+    public void setCardTerminal(LoginMessage loginMessage) throws CardException {
+        String cardTerminal = loginMessage.getCardReader();
         List<CardTerminal> terminals = getAllTerminals();
         if (terminals == null) {
             return;
@@ -193,10 +195,11 @@ public class SmartCardCommunication {
         this.secureChannelEstablished = true;
     }
 
-    public void verifyPin(String pinString) throws Exception {
+    public void verifyPin(LoginMessage loginMessage) throws Exception {
         Card connection = cardTerminal.connect("T=1");
         CardChannel cs = connection.getBasicChannel();
 
+        String pinString = loginMessage.getUserPin();
         byte[] pin = pinString.getBytes(StandardCharsets.US_ASCII);
         byte[] enc = new byte[pin.length + 1];
         enc[0] = (byte) pin.length;
@@ -226,11 +229,13 @@ public class SmartCardCommunication {
         System.out.println(responseAPDU.getSW());
     }
 
-    public void putUserAccountDataToCard(String userAccountDataJSON) throws IllegalBlockSizeException, InvalidKeyException,
+    public void putUserAccountDataToCard(UserAccountMessage userAccountMessage) throws IllegalBlockSizeException, InvalidKeyException,
             BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException, CardException {
 
+        userAccountMessage.setStatusCode(StatusCode.OK);
         Card connection = cardTerminal.connect("T=1");
         CardChannel cs = connection.getBasicChannel();
+        String userAccountDataJSON = userAccountMessage.getUserAccountList();
         int le = userAccountDataJSON.getBytes(StandardCharsets.UTF_8).length;
         byte[] data = new byte[le + 2];
         data[0] = (byte) ((le >> 0x08) & 0xFF);
@@ -246,13 +251,13 @@ public class SmartCardCommunication {
         ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
         if (responseAPDU.getSW() != 0x9000) {
             if (responseAPDU.getSW() == 0x6982) {
-                //additionalDataMessage.setStatusCode(StatusCode.UnauthorizedUser);
+                userAccountMessage.setStatusCode(StatusCode.UnauthorizedUser);
                 throw new CardException("Unauthorized user!");
             } else if (responseAPDU.getSW() == 0x6F00) {
-                //additionalDataMessage.setStatusCode(StatusCode.CardInternalError);
+                userAccountMessage.setStatusCode(StatusCode.CardInternalError);
                 throw new CardException("Something went wrong! Internal Error!");
             } else {
-                //additionalDataMessage.setStatusCode(StatusCode.GenericError);
+                userAccountMessage.setStatusCode(StatusCode.GenericError);
                 throw new CardException(responseAPDU.toString());
             }
         }
@@ -260,6 +265,7 @@ public class SmartCardCommunication {
 
     public void getUserAccountDataFromCard(UserAccountMessage userAccountMessage) throws CardException, IllegalBlockSizeException,
             InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+        userAccountMessage.setStatusCode(StatusCode.OK);
         Card connection = cardTerminal.connect("T=1");
         CardChannel cs = connection.getBasicChannel();
         CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xCC, 0x00, 0x00);

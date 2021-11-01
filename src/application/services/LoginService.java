@@ -31,9 +31,9 @@ public class LoginService extends Service<LoginMessage> {
                 SmartCardCommunication communication = SmartCardCommunication.getInstance();
                 loginMessage.setStatusCode(StatusCode.OK);
 
-                communication.setCardTerminal(loginMessage.getCardReader());
+                communication.setCardTerminal(loginMessage);
                 communication.establishSecureChannel();
-                communication.verifyPin(loginMessage.getUserPin());
+                communication.verifyPin(loginMessage);
                 
 
                 return loginMessage;
