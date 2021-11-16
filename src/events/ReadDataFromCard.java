@@ -21,7 +21,6 @@ public class ReadDataFromCard implements EventHandler<ActionEvent> {
         this.readDataFromCardService = readDataFromCardService;
         this.readDataFromCardService.setOnSucceeded(workerStateEvent -> {
             UserAccountMessage result = this.readDataFromCardService.getValue();
-            System.out.println("Response read from card: " + result.getStatusCode());
             String userAccountJSON = result.getUserAccountList();
             if (result.getStatusCode() != StatusCode.OK || userAccountJSON == null || userAccountJSON.equals("")) {
                 return;

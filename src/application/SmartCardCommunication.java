@@ -289,42 +289,64 @@ public class SmartCardCommunication {
 
     public void getUserAccountDataFromCard(UserAccountMessage userAccountMessage) throws CardException, IllegalBlockSizeException,
             InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
-        userAccountMessage.setStatusCode(StatusCode.OK);
-        Card connection = cardTerminal.connect("T=1");
-        CardChannel cs = connection.getBasicChannel();
-        CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xCC, 0x00, 0x00);
-        ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
 
-        if (responseAPDU.getSW() != 0x9000) {
-            if (responseAPDU.getSW() == 0x6982) {
-                userAccountMessage.setStatusCode(StatusCode.UnauthorizedUser);
-                throw new CardException("Unauthorized user!");
-            } else if (responseAPDU.getSW() == 0x6F00) {
-                userAccountMessage.setStatusCode(StatusCode.CardInternalError);
-                throw new CardException("Something went wrong! Internal Error!");
-            } else {
-                userAccountMessage.setStatusCode(StatusCode.CardGenericError);
-                throw new CardException(responseAPDU.toString());
+        try {
+            userAccountMessage.setStatusCode(StatusCode.GenericError);
+            userAccountMessage.setUserAccountList(null);
+
+            Card connection = cardTerminal.connect("T=1");
+            CardChannel cs = connection.getBasicChannel();
+            CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xCC, 0x00, 0x00);
+            ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
+
+            if (responseAPDU.getSW() != 0x9000) {
+                if (responseAPDU.getSW() == 0x6982) {
+                    userAccountMessage.setStatusCode(StatusCode.UnauthorizedUser);
+                    throw new CardException("Unauthorized user!");
+                } else if (responseAPDU.getSW() == 0x6F00) {
+                    userAccountMessage.setStatusCode(StatusCode.CardInternalError);
+                    throw new CardException("Something went wrong! Internal Error!");
+                } else {
+                    userAccountMessage.setStatusCode(StatusCode.CardGenericError);
+                    throw new CardException(responseAPDU.toString());
+                }
             }
-        }
-        byte[] dec = decrypt(responseAPDU.getData(), this.secretKey);
-        int len = (dec[0] & 0xff) * 256 + (dec[1] & 0xff);
-        userAccountMessage.setUserAccountList(null);
-        if (len == 0) {
-            return;
-        }
-        byte[] data = new byte[len];
-        System.arraycopy(dec, 2, data, 0, len);
-        int lenUserAccountListData = (data[0] & 0xff) * 256 + (data[1] & 0xff);
-        byte[] userAccountListByte = new byte[lenUserAccountListData];
-        if (lenUserAccountListData > data.length) {
-            userAccountMessage.setStatusCode(StatusCode.WrongLength);
-            throw new CardException("Wrong additional data format on card!");
-        }
-        System.arraycopy(data, 2, userAccountListByte, 0, lenUserAccountListData);
-        String s = new String(userAccountListByte);
+            byte[] dec = decrypt(responseAPDU.getData(), this.secretKey);
+            int len = (dec[0] & 0xff) * 256 + (dec[1] & 0xff);
+            if (len == 0) {
+                return;
+            }
+            byte[] data = new byte[len];
+            System.arraycopy(dec, 2, data, 0, len);
+            int lenUserAccountListData = (data[0] & 0xff) * 256 + (data[1] & 0xff);
+            byte[] userAccountListByte = new byte[lenUserAccountListData];
+            if (lenUserAccountListData > data.length) {
+                userAccountMessage.setStatusCode(StatusCode.WrongLength);
+                throw new CardException("Wrong additional data format on card!");
+            }
+            System.arraycopy(data, 2, userAccountListByte, 0, lenUserAccountListData);
+            String s = new String(userAccountListByte);
 
-        userAccountMessage.setUserAccountList(s);
+            userAccountMessage.setUserAccountList(s);
+            userAccountMessage.setStatusCode(StatusCode.OK);
+        } catch (CardException ex) {
+            throw new CardException(ex.getMessage());
+        } catch (IllegalBlockSizeException ex) {
+            userAccountMessage.setStatusCode(StatusCode.IllegalBlockSizeException);
+            throw new IllegalBlockSizeException(ex.getMessage());
+        } catch (InvalidKeyException ex) {
+            userAccountMessage.setStatusCode(StatusCode.InvalidKeyException);
+            throw new InvalidKeyException(ex.getMessage());
+        } catch (BadPaddingException ex) {
+            userAccountMessage.setStatusCode(StatusCode.BadPaddingException);
+            throw new BadPaddingException(ex.getMessage());
+        } catch (NoSuchAlgorithmException ex) {
+            userAccountMessage.setStatusCode(StatusCode.NoSuchAlgorithmException);
+            throw new NoSuchAlgorithmException(ex.getMessage());
+        } catch (NoSuchPaddingException ex) {
+            userAccountMessage.setStatusCode(StatusCode.NoSuchPaddingException);
+            throw new NoSuchPaddingException(ex.getMessage());
+        }
     }
 
     private boolean selectApplet() throws CardException {

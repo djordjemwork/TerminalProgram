@@ -23,6 +23,7 @@ public class StatusCode {
     public final static int IllegalArgumentException = 18;
     public final static int PACEException = 19;
     public final static int PACENotDone = 20;
+    public final static int UnsupportedEncodingException = 21;
 
     public final static int MOCCounterWasNotReset = 100;
     public final static int UserPINWasNotReset = 101;
@@ -66,5 +67,4 @@ public class StatusCode {
 
     public final static int RequestedTerminalRecovery = 998;
     public final static int GenericError = 999;
-    public final static int UnsupportedEncodingException = 21;
 }
