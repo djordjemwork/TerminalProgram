@@ -232,35 +232,59 @@ public class SmartCardCommunication {
     public void putUserAccountDataToCard(UserAccountMessage userAccountMessage) throws IllegalBlockSizeException, InvalidKeyException,
             BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, UnsupportedEncodingException, CardException {
 
-        userAccountMessage.setStatusCode(StatusCode.OK);
-        Card connection = cardTerminal.connect("T=1");
-        CardChannel cs = connection.getBasicChannel();
-        String userAccountDataJSON = userAccountMessage.getUserAccountList();
-        int le = userAccountDataJSON.getBytes(StandardCharsets.UTF_8).length;
-        byte[] data = new byte[le + 2];
-        data[0] = (byte) ((le >> 0x08) & 0xFF);
-        data[1] = (byte) (le & 0xFF);
-        System.arraycopy(userAccountDataJSON.getBytes("UTF-8"), 0, data, 2, le);
+        try {
+            userAccountMessage.setStatusCode(StatusCode.GenericError);
+            Card connection = cardTerminal.connect("T=1");
+            CardChannel cs = connection.getBasicChannel();
+            String userAccountDataJSON = userAccountMessage.getUserAccountList();
+            int le = userAccountDataJSON.getBytes(StandardCharsets.UTF_8).length;
+            byte[] data = new byte[le + 2];
+            data[0] = (byte) ((le >> 0x08) & 0xFF);
+            data[1] = (byte) (le & 0xFF);
+            System.arraycopy(userAccountDataJSON.getBytes("UTF-8"), 0, data, 2, le);
 
-        byte[] enc = new byte[data.length + 2];
-        enc[0] = (byte) ((data.length >> 0x08) & 0xFF);
-        enc[1] = (byte) (data.length & 0xFF);
-        System.arraycopy(data, 0, enc, 2, data.length);
-        enc = encrypt(enc, this.secretKey);
-        CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xDC, 0x00, 0x00, enc);
-        ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
-        if (responseAPDU.getSW() != 0x9000) {
-            if (responseAPDU.getSW() == 0x6982) {
-                userAccountMessage.setStatusCode(StatusCode.UnauthorizedUser);
-                throw new CardException("Unauthorized user!");
-            } else if (responseAPDU.getSW() == 0x6F00) {
-                userAccountMessage.setStatusCode(StatusCode.CardInternalError);
-                throw new CardException("Something went wrong! Internal Error!");
-            } else {
-                userAccountMessage.setStatusCode(StatusCode.GenericError);
-                throw new CardException(responseAPDU.toString());
+            byte[] enc = new byte[data.length + 2];
+            enc[0] = (byte) ((data.length >> 0x08) & 0xFF);
+            enc[1] = (byte) (data.length & 0xFF);
+            System.arraycopy(data, 0, enc, 2, data.length);
+            enc = encrypt(enc, this.secretKey);
+            CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xDC, 0x00, 0x00, enc);
+            ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
+            if (responseAPDU.getSW() != 0x9000) {
+                if (responseAPDU.getSW() == 0x6982) {
+                    userAccountMessage.setStatusCode(StatusCode.UnauthorizedUser);
+                    throw new CardException("Unauthorized user!");
+                } else if (responseAPDU.getSW() == 0x6F00) {
+                    userAccountMessage.setStatusCode(StatusCode.CardInternalError);
+                    throw new CardException("Something went wrong! Internal Error!");
+                } else {
+                    userAccountMessage.setStatusCode(StatusCode.GenericError);
+                    throw new CardException(responseAPDU.toString());
+                }
             }
+            userAccountMessage.setStatusCode(StatusCode.OK);
+        } catch (IllegalBlockSizeException ex) {
+            userAccountMessage.setStatusCode(StatusCode.IllegalBlockSizeException);
+            throw new IllegalBlockSizeException(ex.getMessage());
+        } catch (InvalidKeyException ex) {
+            userAccountMessage.setStatusCode(StatusCode.InvalidKeyException);
+            throw new InvalidKeyException(ex.getMessage());
+        } catch (BadPaddingException ex) {
+            userAccountMessage.setStatusCode(StatusCode.BadPaddingException);
+            throw new BadPaddingException(ex.getMessage());
+        } catch (NoSuchAlgorithmException ex) {
+            userAccountMessage.setStatusCode(StatusCode.NoSuchAlgorithmException);
+            throw new NoSuchAlgorithmException(ex.getMessage());
+        } catch (NoSuchPaddingException ex) {
+            userAccountMessage.setStatusCode(StatusCode.NoSuchPaddingException);
+            throw new NoSuchPaddingException(ex.getMessage());
+        } catch (UnsupportedEncodingException ex) {
+            userAccountMessage.setStatusCode(StatusCode.UnsupportedEncodingException);
+            throw new UnsupportedEncodingException(ex.getMessage());
+        } catch (CardException ex) {
+            throw new CardException(ex.getMessage());
         }
+
     }
 
     public void getUserAccountDataFromCard(UserAccountMessage userAccountMessage) throws CardException, IllegalBlockSizeException,

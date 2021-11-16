@@ -19,7 +19,7 @@ public class Util {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         ex.printStackTrace(pw);
-        String exceptionText = sw.toString();
+        String exceptionText = ex.getLocalizedMessage();
 
         Label label = new Label("The exception stacktrace was:");
 
