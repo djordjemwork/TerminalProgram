@@ -65,7 +65,7 @@ public class SmartCardCommunication {
         }
     }
 
-    public SecretKey getSymmetricKey() throws Exception {
+    public SecretKey getSymmetricKey(LoginMessage loginMessage) throws Exception {
         Card connection = cardTerminal.connect("T=1");
         CardChannel cs = connection.getBasicChannel();
         SecureRandom random = new SecureRandom();
@@ -184,14 +184,14 @@ public class SmartCardCommunication {
         return tf.terminals().list();
     }
 
-    public void establishSecureChannel() throws Exception {
+    public void establishSecureChannel(LoginMessage loginMessage) throws Exception {
         if (cardTerminal == null) {
             throw new CardInitException("Error Initalization! CardReader is not Initialized");
         }
-        if (!selectApplet()) {
+        if (!selectApplet(loginMessage)) {
             throw new Exception("Error in selecting Applet");
         }
-        this.secretKey = getSymmetricKey();
+        this.secretKey = getSymmetricKey(loginMessage);
         this.secureChannelEstablished = true;
     }
 
@@ -226,7 +226,6 @@ public class SmartCardCommunication {
                 throw new Exception("Required Removing Card! Function not supported");
             }
         }
-        System.out.println(responseAPDU.getSW());
     }
 
     public void putUserAccountDataToCard(UserAccountMessage userAccountMessage) throws IllegalBlockSizeException, InvalidKeyException,
@@ -349,7 +348,7 @@ public class SmartCardCommunication {
         }
     }
 
-    private boolean selectApplet() throws CardException {
+    private boolean selectApplet(LoginMessage loginMessage) throws CardException {
         Card connection = cardTerminal.connect("T=1");
         CardChannel cardChannel = connection.getBasicChannel();
         CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x04, 0x00, hexStringToByteArray("A0000002481101"));

@@ -32,7 +32,7 @@ public class LoginService extends Service<LoginMessage> {
                 loginMessage.setStatusCode(StatusCode.OK);
 
                 communication.setCardTerminal(loginMessage);
-                communication.establishSecureChannel();
+                communication.establishSecureChannel(loginMessage);
                 communication.verifyPin(loginMessage);
                 
 
