@@ -24,6 +24,8 @@ public class StatusCode {
     public final static int PACEException = 19;
     public final static int PACENotDone = 20;
     public final static int UnsupportedEncodingException = 21;
+    public final static int NoSelectingApplet = 22;
+    public final static int SymmetricKeyFail = 23;
 
     public final static int MOCCounterWasNotReset = 100;
     public final static int UserPINWasNotReset = 101;

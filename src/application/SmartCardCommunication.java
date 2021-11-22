@@ -1,7 +1,6 @@
 package application;
 
 import application.exceptions.CardInitException;
-import controllers.LoginController;
 import entity.LoginMessage;
 import entity.StatusCode;
 import entity.UserAccountMessage;
@@ -52,20 +51,26 @@ public class SmartCardCommunication {
     }
 
     public void setCardTerminal(LoginMessage loginMessage) throws CardException {
-        String cardTerminal = loginMessage.getCardReader();
-        List<CardTerminal> terminals = getAllTerminals();
-        if (terminals == null) {
-            return;
-        }
-        for (CardTerminal terminal : terminals) {
-            if (terminal.toString().split("PC/SC terminal ")[1].equals(cardTerminal)) {
-                this.cardTerminal = terminal;
+        try {
+            String cardTerminal = loginMessage.getCardReader();
+            List<CardTerminal> terminals = getAllTerminals();
+            if (terminals == null) {
                 return;
             }
+            for (CardTerminal terminal : terminals) {
+                if (terminal.toString().split("PC/SC terminal ")[1].equals(cardTerminal)) {
+                    this.cardTerminal = terminal;
+                    return;
+                }
+            }
+        } catch (CardException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CardException(ex);
         }
     }
 
-    public SecretKey getSymmetricKey(LoginMessage loginMessage) throws Exception {
+    public SecretKey getSymmetricKey(LoginMessage loginMessage) throws CardException, NoSuchAlgorithmException,
+            InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         Card connection = cardTerminal.connect("T=1");
         CardChannel cs = connection.getBasicChannel();
         SecureRandom random = new SecureRandom();
@@ -89,9 +94,11 @@ public class SmartCardCommunication {
             ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
             if (responseAPDU.getSW() != 0x9000) {
                 if (responseAPDU.getSW() == 0x6F00) {
-                    throw new Exception("Something went wrong! Internal Error!");
+                    loginMessage.setStatusCode(StatusCode.CardInternalError);
+                    throw new CardException("Something went wrong! Internal Error!");
                 } else {
-                    throw new Exception(responseAPDU.toString());
+                    loginMessage.setStatusCode(StatusCode.GenericError);
+                    throw new CardException(responseAPDU.toString());
                 }
             }
 
@@ -128,9 +135,11 @@ public class SmartCardCommunication {
             responseAPDU = cs.transmit(commandAPDU);
             if (responseAPDU.getSW() != 0x9000) {
                 if (responseAPDU.getSW() == 0x6F00) {
-                    throw new Exception("Something went wrong! Internal Error!");
+                    loginMessage.setStatusCode(StatusCode.CardInternalError);
+                    throw new CardException("Something went wrong! Internal Error!");
                 } else {
-                    throw new Exception(responseAPDU.toString());
+                    loginMessage.setStatusCode(StatusCode.GenericError);
+                    throw new CardException(responseAPDU.toString());
                 }
             }
             byte[] dec = decrypt(responseAPDU.getData(), sKeyS);
@@ -143,7 +152,8 @@ public class SmartCardCommunication {
                 counterSymetricKeyFail++;
             }
             if (counterSymetricKeyFail > 5) {
-                return null;
+                loginMessage.setStatusCode(StatusCode.SymmetricKeyFail);
+                throw new CardException("Error in establishing symmetric key");
             }
         }
         this.secureChannelEstablished = true;
@@ -174,7 +184,7 @@ public class SmartCardCommunication {
                 cardReaders.setValue(terminal.toString().split("PC/SC terminal ")[1].trim());
             }
         } catch (CardException e) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
         }
 
     }
@@ -184,47 +194,110 @@ public class SmartCardCommunication {
         return tf.terminals().list();
     }
 
-    public void establishSecureChannel(LoginMessage loginMessage) throws Exception {
-        if (cardTerminal == null) {
-            throw new CardInitException("Error Initalization! CardReader is not Initialized");
+    public void establishSecureChannel(LoginMessage loginMessage) throws CardInitException, CardException,
+            NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException,
+            InvalidKeyException {
+        try {
+            if (cardTerminal == null) {
+                throw new CardInitException("Error Initialization! CardReader is not Initialized");
+            }
+            selectApplet(loginMessage);
+
+            this.secretKey = getSymmetricKey(loginMessage);
+            this.secureChannelEstablished = true;
+        } catch (CardInitException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
+            loginMessage.setStatusCode(StatusCode.CardReaderIsNotInitialized);
+            throw new CardInitException(ex.getMessage());
+        } catch (CardException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CardException(ex);
+        } catch (NoSuchAlgorithmException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.NoSuchPaddingException);
+            throw new NoSuchAlgorithmException(e.getMessage());
+        } catch (InvalidKeyException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.InvalidKeyException);
+            throw new InvalidKeyException(e.getMessage());
+        } catch (NoSuchPaddingException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.NoSuchPaddingException);
+            throw new NoSuchPaddingException(e.getMessage());
+        } catch (BadPaddingException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.BadPaddingException);
+            throw new BadPaddingException(e.getMessage());
+        } catch (IllegalBlockSizeException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.IllegalBlockSizeException);
+            throw new IllegalBlockSizeException(e.getMessage());
         }
-        if (!selectApplet(loginMessage)) {
-            throw new Exception("Error in selecting Applet");
-        }
-        this.secretKey = getSymmetricKey(loginMessage);
-        this.secureChannelEstablished = true;
     }
 
-    public void verifyPin(LoginMessage loginMessage) throws Exception {
-        Card connection = cardTerminal.connect("T=1");
-        CardChannel cs = connection.getBasicChannel();
+    public void verifyPin(LoginMessage loginMessage) throws CardException, NoSuchAlgorithmException, InvalidKeyException,
+            NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
+        try {
+            Card connection = cardTerminal.connect("T=1");
+            CardChannel cs = connection.getBasicChannel();
 
-        String pinString = loginMessage.getUserPin();
-        byte[] pin = pinString.getBytes(StandardCharsets.US_ASCII);
-        byte[] enc = new byte[pin.length + 1];
-        enc[0] = (byte) pin.length;
-        System.arraycopy(pin, 0, enc, 1, pin.length);
-        enc = encrypt(enc, this.secretKey);
+            String pinString = loginMessage.getUserPin();
+            byte[] pin = pinString.getBytes(StandardCharsets.US_ASCII);
+            byte[] enc = new byte[pin.length + 1];
+            enc[0] = (byte) pin.length;
+            System.arraycopy(pin, 0, enc, 1, pin.length);
+            enc = encrypt(enc, this.secretKey);
 
-        CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0x20, 0x00, 0x00, enc);
-        ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
-        if (responseAPDU.getSW() != 0x9000) {
-            System.out.println((short) responseAPDU.getSW());
-            if (responseAPDU.getSW() == 0x6B00) {
-                throw new Exception("SW wrong P1 and P2");
-            } else if (responseAPDU.getSW() == 0x6983) {
-                throw new Exception("Authentication method blocked! No more remaining retries!");
-            } else if (responseAPDU.getSW() == 0x6982) {
-                throw new Exception("Pin was not correct!");
-            } else if (responseAPDU.getSW() == 0x63C0) {
-                throw new Exception("Verification failed! Card is locked!");
-            } else if (responseAPDU.getSW() == 0x63C1) {
-                throw new Exception("Verification failed! One more attempt left!");
-            } else if (responseAPDU.getSW() == 0x63C2) {
-                throw new Exception("Verification failed! Two more attempt left!");
-            } else if (responseAPDU.getSW() == 0x6F00) {
-                throw new Exception("Required Removing Card! Function not supported");
+            CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0x20, 0x00, 0x00, enc);
+            ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
+            if (responseAPDU.getSW() != 0x9000) {
+                System.out.println((short) responseAPDU.getSW());
+                if (responseAPDU.getSW() == 0x6B00) {
+                    loginMessage.setStatusCode(StatusCode.SW_WrongP1P2);
+                    throw new CardException("SW wrong P1 and P2");
+                } else if (responseAPDU.getSW() == 0x6983) {
+                    loginMessage.setStatusCode(StatusCode.AuthenticationMethodBlockedNoMoreRemainingRetries);
+                    throw new CardException("Authentication method blocked! No more remaining retries!");
+                } else if (responseAPDU.getSW() == 0x6982) {
+                    loginMessage.setStatusCode(StatusCode.PinWasNotCorrect);
+                    throw new CardException("Pin was not correct!");
+                } else if (responseAPDU.getSW() == 0x63C0) {
+                    loginMessage.setStatusCode(StatusCode.VerificationFailedCardIsLocked);
+                    throw new CardException("Verification failed! Card is locked!");
+                } else if (responseAPDU.getSW() == 0x63C1) {
+                    loginMessage.setStatusCode(StatusCode.VerificationFailedOneMoreAttemptLeft);
+                    throw new CardException("Verification failed! One more attempt left!");
+                } else if (responseAPDU.getSW() == 0x63C2) {
+                    loginMessage.setStatusCode(StatusCode.VerificationFailedTwoMoreAttemptLeft);
+                    throw new CardException("Verification failed! Two more attempt left!");
+                } else if (responseAPDU.getSW() == 0x6F00) {
+                    loginMessage.setStatusCode(StatusCode.RequiredRemovingCard);
+                    throw new CardException("Required Removing Card! Function not supported");
+                }
             }
+        } catch (CardException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CardException(ex);
+        } catch (NoSuchAlgorithmException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.NoSuchAlgorithmException);
+            throw new NoSuchAlgorithmException(e.getMessage());
+        } catch (InvalidKeyException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.InvalidKeyException);
+            throw new InvalidKeyException(e.getMessage());
+        } catch (NoSuchPaddingException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.NoSuchPaddingException);
+            throw new NoSuchPaddingException(e.getMessage());
+        } catch (BadPaddingException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.BadPaddingException);
+            throw new BadPaddingException(e.getMessage());
+        } catch (IllegalBlockSizeException e) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, e);
+            loginMessage.setStatusCode(StatusCode.IllegalBlockSizeException);
+            throw new IllegalBlockSizeException(e.getMessage());
         }
     }
 
@@ -263,24 +336,31 @@ public class SmartCardCommunication {
             }
             userAccountMessage.setStatusCode(StatusCode.OK);
         } catch (IllegalBlockSizeException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.IllegalBlockSizeException);
             throw new IllegalBlockSizeException(ex.getMessage());
         } catch (InvalidKeyException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.InvalidKeyException);
             throw new InvalidKeyException(ex.getMessage());
         } catch (BadPaddingException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.BadPaddingException);
             throw new BadPaddingException(ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.NoSuchAlgorithmException);
             throw new NoSuchAlgorithmException(ex.getMessage());
         } catch (NoSuchPaddingException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.NoSuchPaddingException);
             throw new NoSuchPaddingException(ex.getMessage());
         } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.UnsupportedEncodingException);
             throw new UnsupportedEncodingException(ex.getMessage());
         } catch (CardException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             throw new CardException(ex.getMessage());
         }
 
@@ -329,31 +409,40 @@ public class SmartCardCommunication {
             userAccountMessage.setUserAccountList(s);
             userAccountMessage.setStatusCode(StatusCode.OK);
         } catch (CardException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             throw new CardException(ex.getMessage());
         } catch (IllegalBlockSizeException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.IllegalBlockSizeException);
             throw new IllegalBlockSizeException(ex.getMessage());
         } catch (InvalidKeyException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.InvalidKeyException);
             throw new InvalidKeyException(ex.getMessage());
         } catch (BadPaddingException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.BadPaddingException);
             throw new BadPaddingException(ex.getMessage());
         } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.NoSuchAlgorithmException);
             throw new NoSuchAlgorithmException(ex.getMessage());
         } catch (NoSuchPaddingException ex) {
+            Logger.getLogger(SmartCardCommunication.class.getName()).log(Level.SEVERE, null, ex);
             userAccountMessage.setStatusCode(StatusCode.NoSuchPaddingException);
             throw new NoSuchPaddingException(ex.getMessage());
         }
     }
 
-    private boolean selectApplet(LoginMessage loginMessage) throws CardException {
+    private void selectApplet(LoginMessage loginMessage) throws CardException {
         Card connection = cardTerminal.connect("T=1");
         CardChannel cardChannel = connection.getBasicChannel();
-        CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x04, 0x00, hexStringToByteArray("A0000002481101"));
+        CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x04, 0x00, hexStringToByteArray(Util.appletID));
         ResponseAPDU responseAPDU = cardChannel.transmit(commandAPDU);
-        return responseAPDU.getSW() == 0x9000;
+        if (responseAPDU.getSW() != 0x9000) {
+            loginMessage.setStatusCode(StatusCode.NoSelectingApplet);
+            throw new CardException("Error in selecting applet");
+        }
     }
 
     private byte[] hexStringToByteArray(String s) {

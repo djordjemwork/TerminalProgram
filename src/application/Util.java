@@ -11,10 +11,12 @@ import java.io.StringWriter;
 
 public class Util {
 
+    public final static String appletID = "A0000002481101";
+
     public static void showException(Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
-        alert.setHeaderText("Look, an Exception Dialog");
+        alert.setHeaderText("There was a problem");
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -39,7 +41,7 @@ public class Util {
 
         alert.getDialogPane().setExpandableContent(expContent);
 
-        alert.showAndWait();
+        alert.show();
     }
 
     public static void showSuccessfulDialog(String message) {

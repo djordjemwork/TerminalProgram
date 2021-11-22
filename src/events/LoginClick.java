@@ -38,12 +38,9 @@ public class LoginClick implements EventHandler<ActionEvent> {
 
             if (result.getStatusCode() == StatusCode.OK)
                 switchScene(actionEvent);
-            else {
-                System.out.println("Wrong pin!!!");
-            }
         });
 
-        this.loginService.setOnFailed(workerStateEvent -> showException((Exception) workerStateEvent.getSource().getException()));
+        this.loginService.setOnFailed(workerStateEvent -> Util.showException((Exception) workerStateEvent.getSource().getException()));
     }
 
     @Override
