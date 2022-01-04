@@ -28,10 +28,7 @@ public class SaveToCardCardService extends Service<UserAccountMessage> {
             @Override
             protected UserAccountMessage call() throws Exception {
                 SmartCardCommunication communication = SmartCardCommunication.getInstance();
-                userAccountMessage.setStatusCode(StatusCode.OK);
-                communication.putUserAccountDataToCard(userAccountMessage.getUserAccountList());
-
-                communication.getUserAccountDataFromCard(userAccountMessage);
+                communication.putUserAccountDataToCard(userAccountMessage);
                 return userAccountMessage;
             }
         };

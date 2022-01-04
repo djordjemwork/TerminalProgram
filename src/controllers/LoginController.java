@@ -28,7 +28,6 @@ public class LoginController implements Initializable {
         SmartCardCommunication communication = SmartCardCommunication.getInstance();
         communication.loadCardReaders(cardReaders);
         buttonLogin.setOnAction(new LoginClick(password, cardReaders, progressBar, new LoginService()));
-
     }
 
 
