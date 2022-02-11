@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main extends Application {
-
     @Override
     public void start(Stage stage) {
         try {
@@ -26,7 +25,6 @@ public class Main extends Application {
             Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-
     public static void main(String[] args) {
         launch(args);
     }

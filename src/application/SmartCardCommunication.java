@@ -89,7 +89,6 @@ public class SmartCardCommunication {
             random.nextBytes(bByte);
             BigInteger b = new BigInteger(bByte);
             b = b.mod(P);
-
             CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0x88, 0x00, 0x00, G.modPow(b, P).toByteArray());
             ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
             if (responseAPDU.getSW() != 0x9000) {
@@ -101,11 +100,9 @@ public class SmartCardCommunication {
                     throw new CardException(responseAPDU.toString());
                 }
             }
-
             byte[] data = responseAPDU.getData();
             byte[] a = new byte[data.length + 1];
             System.arraycopy(data, 0, a, 1, data.length);
-
             BigInteger A = new BigInteger(a);
             BigInteger K = A.modPow(b, P);
             byte[] sha1;
@@ -126,7 +123,6 @@ public class SmartCardCommunication {
             sha1 = md.digest(sha1);
             sha1 = Arrays.copyOf(sha1, 16);
             sKeyS = new SecretKeySpec(sha1, "AES");
-
             byte[] enc = new byte[randData.length + 1];
             enc[0] = (byte) randData.length;
             System.arraycopy(randData, 0, enc, 1, randData.length);
@@ -202,7 +198,6 @@ public class SmartCardCommunication {
                 throw new CardInitException("Error Initialization! CardReader is not Initialized");
             }
             selectApplet(loginMessage);
-
             this.secretKey = getSymmetricKey(loginMessage);
             this.secureChannelEstablished = true;
         } catch (CardInitException ex) {

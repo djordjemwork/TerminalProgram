@@ -27,20 +27,19 @@ public class LoginClick implements EventHandler<ActionEvent> {
     private final LoginService loginService;
     private ActionEvent actionEvent;
 
-    public LoginClick(PasswordField password, ComboBox<String> cardTerminals, ProgressBar progressBar, LoginService loginService) {
+    public LoginClick(PasswordField password, ComboBox<String> cardTerminals,
+                      ProgressBar progressBar, LoginService loginService) {
         this.password = password;
         this.cardTerminals = cardTerminals;
         this.loginService = loginService;
         progressBar.visibleProperty().bind(loginService.runningProperty());
-
         this.loginService.setOnSucceeded(workerStateEvent -> {
-            LoginMessage result = this.loginService.getValue();   //here you get the return value of your service
-
+            LoginMessage result = this.loginService.getValue();
             if (result.getStatusCode() == StatusCode.OK)
                 switchScene(actionEvent);
         });
-
-        this.loginService.setOnFailed(workerStateEvent -> Util.showException((Exception) workerStateEvent.getSource().getException()));
+        this.loginService.setOnFailed(workerStateEvent ->
+                Util.showException((Exception) workerStateEvent.getSource().getException()));
     }
 
     @Override
@@ -49,12 +48,10 @@ public class LoginClick implements EventHandler<ActionEvent> {
             return;
         }
         this.actionEvent = event;
-
         CardReader.cardReader = cardTerminals.getSelectionModel().getSelectedItem();
         LoginMessage loginMessage = new LoginMessage();
         loginMessage.setCardReader(cardTerminals.getSelectionModel().getSelectedItem());
         loginMessage.setUserPin(password.getText());
-
         loginService.setLoginMessage(loginMessage);
         loginService.restart();
     }

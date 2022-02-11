@@ -22,13 +22,31 @@ public class LoginController implements Initializable {
     private ComboBox<String> cardReaders;
     @FXML
     private ProgressBar progressBar;
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         SmartCardCommunication communication = SmartCardCommunication.getInstance();
         communication.loadCardReaders(cardReaders);
         buttonLogin.setOnAction(new LoginClick(password, cardReaders, progressBar, new LoginService()));
     }
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

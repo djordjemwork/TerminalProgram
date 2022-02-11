@@ -7,21 +7,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 public class ReadDataFromCardService extends Service<UserAccountMessage> {
-
     private UserAccountMessage userAccountMessage;
-
-    public ReadDataFromCardService() {
-
-    }
-
-    public void setUserAccountMessage(UserAccountMessage userAccountMessage) {
-        this.userAccountMessage = userAccountMessage;
-    }
-
-    public UserAccountMessage getUserAccountMessage() {
-        return userAccountMessage;
-    }
-
     @Override
     protected Task<UserAccountMessage> createTask() {
         return new Task<UserAccountMessage>() {
@@ -33,4 +19,25 @@ public class ReadDataFromCardService extends Service<UserAccountMessage> {
             }
         };
     }
+    public void setUserAccountMessage(UserAccountMessage userAccountMessage) {
+        this.userAccountMessage = userAccountMessage;
+    }
+    public UserAccountMessage getUserAccountMessage() {
+        return userAccountMessage;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
