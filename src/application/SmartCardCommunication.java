@@ -89,7 +89,8 @@ public class SmartCardCommunication {
             random.nextBytes(bByte);
             BigInteger b = new BigInteger(bByte);
             b = b.mod(P);
-            CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0x88, 0x00, 0x00, G.modPow(b, P).toByteArray());
+            CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0x88, 0x00, 0x00,
+                    G.modPow(b, P).toByteArray());
             ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
             if (responseAPDU.getSW() != 0x9000) {
                 if (responseAPDU.getSW() == 0x6F00) {
@@ -142,9 +143,9 @@ public class SmartCardCommunication {
             int len = 16;
             byte[] decRandData = new byte[len];
             System.arraycopy(dec, 2, decRandData, 0, len);
-            if (Arrays.equals(randData, decRandData)) {
+            if (Arrays.equals(randData, decRandData))
                 sameKeys = true;
-            } else {
+             else {
                 counterSymetricKeyFail++;
             }
             if (counterSymetricKeyFail > 5) {
@@ -156,14 +157,16 @@ public class SmartCardCommunication {
         return sKeyS;
     }
 
-    private byte[] encrypt(byte[] message, SecretKey sKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
+    private byte[] encrypt(byte[] message, SecretKey sKey) throws
+            NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, sKey);
         return cipher.doFinal(message);
     }
 
-    private byte[] decrypt(byte[] encrypted, SecretKey sKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
+    private byte[] decrypt(byte[] encrypted, SecretKey sKey) throws
+            NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, sKey);
@@ -363,16 +366,13 @@ public class SmartCardCommunication {
 
     public void getUserAccountDataFromCard(UserAccountMessage userAccountMessage) throws CardException, IllegalBlockSizeException,
             InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
-
         try {
             userAccountMessage.setStatusCode(StatusCode.GenericError);
             userAccountMessage.setUserAccountList(null);
-
             Card connection = cardTerminal.connect("T=1");
             CardChannel cs = connection.getBasicChannel();
             CommandAPDU commandAPDU = new CommandAPDU(0x0C, 0xCC, 0x00, 0x00);
             ResponseAPDU responseAPDU = cs.transmit(commandAPDU);
-
             if (responseAPDU.getSW() != 0x9000) {
                 if (responseAPDU.getSW() == 0x6982) {
                     userAccountMessage.setStatusCode(StatusCode.UnauthorizedUser);
@@ -387,9 +387,8 @@ public class SmartCardCommunication {
             }
             byte[] dec = decrypt(responseAPDU.getData(), this.secretKey);
             int len = (dec[0] & 0xff) * 256 + (dec[1] & 0xff);
-            if (len == 0) {
+            if (len == 0)
                 return;
-            }
             byte[] data = new byte[len];
             System.arraycopy(dec, 2, data, 0, len);
             int lenUserAccountListData = (data[0] & 0xff) * 256 + (data[1] & 0xff);
@@ -400,7 +399,6 @@ public class SmartCardCommunication {
             }
             System.arraycopy(data, 2, userAccountListByte, 0, lenUserAccountListData);
             String s = new String(userAccountListByte);
-
             userAccountMessage.setUserAccountList(s);
             userAccountMessage.setStatusCode(StatusCode.OK);
         } catch (CardException ex) {
@@ -432,7 +430,8 @@ public class SmartCardCommunication {
     private void selectApplet(LoginMessage loginMessage) throws CardException {
         Card connection = cardTerminal.connect("T=1");
         CardChannel cardChannel = connection.getBasicChannel();
-        CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x04, 0x00, hexStringToByteArray(Util.appletID));
+        CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x04, 0x00,
+                hexStringToByteArray(Util.appletID));
         ResponseAPDU responseAPDU = cardChannel.transmit(commandAPDU);
         if (responseAPDU.getSW() != 0x9000) {
             loginMessage.setStatusCode(StatusCode.NoSelectingApplet);
