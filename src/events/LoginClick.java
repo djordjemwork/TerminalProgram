@@ -3,8 +3,8 @@ package events;
 import application.CardReader;
 import application.Util;
 import application.services.LoginService;
-import entity.LoginMessage;
-import entity.StatusCode;
+import application.entity.LoginMessage;
+import application.entity.StatusCode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -18,8 +18,6 @@ import javafx.stage.Stage;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static application.Util.showException;
 
 public class LoginClick implements EventHandler<ActionEvent> {
     private final PasswordField password;

@@ -1,4 +1,4 @@
-package entity;
+package application.entity;
 
 public class StatusCode {
     public static int OK = 0;

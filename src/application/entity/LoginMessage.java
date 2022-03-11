@@ -1,4 +1,4 @@
-package entity;
+package application.entity;
 
 public class LoginMessage {
     protected String masterPin;

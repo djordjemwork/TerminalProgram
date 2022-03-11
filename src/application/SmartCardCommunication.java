@@ -1,9 +1,9 @@
 package application;
 
 import application.exceptions.CardInitException;
-import entity.LoginMessage;
-import entity.StatusCode;
-import entity.UserAccountMessage;
+import application.entity.LoginMessage;
+import application.entity.StatusCode;
+import application.entity.UserAccountMessage;
 import javafx.scene.control.ComboBox;
 import org.jmrtd.lds.PACEInfo;
 

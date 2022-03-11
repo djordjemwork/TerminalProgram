@@ -2,7 +2,7 @@ package controllers;
 
 import application.services.ReadDataFromCardService;
 import application.services.SaveToCardCardService;
-import entity.UserAccount;
+import application.entity.UserAccount;
 import events.ReadDataFromCard;
 import events.SaveToCardClick;
 import javafx.collections.ObservableList;

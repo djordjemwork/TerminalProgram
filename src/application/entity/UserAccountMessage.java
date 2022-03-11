@@ -1,6 +1,4 @@
-package entity;
-
-import java.util.List;
+package application.entity;
 
 public class UserAccountMessage {
     private String userAccountListJSON;

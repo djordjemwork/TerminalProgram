@@ -1,8 +1,6 @@
 package application.exceptions;
 
 
-import entity.StatusCode;
-
 import net.sf.scuba.smartcards.CardServiceException;
 
 public class CardInitException extends CardServiceException {
