@@ -1,4 +1,4 @@
-package controllers;
+package application.controllers;
 
 import application.SmartCardCommunication;
 import application.services.LoginService;

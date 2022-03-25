@@ -143,8 +143,9 @@ public class SmartCardCommunication {
             int len = 16;
             byte[] decRandData = new byte[len];
             System.arraycopy(dec, 2, decRandData, 0, len);
-            if (Arrays.equals(randData, decRandData))
+            if (Arrays.equals(randData, decRandData)) {
                 sameKeys = true;
+            }
              else {
                 counterSymetricKeyFail++;
             }
@@ -430,9 +431,10 @@ public class SmartCardCommunication {
     private void selectApplet(LoginMessage loginMessage) throws CardException {
         Card connection = cardTerminal.connect("T=1");
         CardChannel cardChannel = connection.getBasicChannel();
-        CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x04, 0x00,
-                hexStringToByteArray(Util.appletID));
+        CommandAPDU commandAPDU = new CommandAPDU(0x00, 0xA4, 0x04, 0x00, hexStringToByteArray(Util.appletID));
+
         ResponseAPDU responseAPDU = cardChannel.transmit(commandAPDU);
+
         if (responseAPDU.getSW() != 0x9000) {
             loginMessage.setStatusCode(StatusCode.NoSelectingApplet);
             throw new CardException("Error in selecting applet");
