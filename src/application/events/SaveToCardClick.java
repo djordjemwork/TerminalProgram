@@ -1,6 +1,6 @@
-package events;
+package application.events;
 
-import application.Util;
+import application.main.Util;
 import application.services.SaveToCardCardService;
 import com.google.gson.GsonBuilder;
 import application.entity.StatusCode;

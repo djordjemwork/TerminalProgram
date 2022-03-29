@@ -1,8 +1,8 @@
 package application.controllers;
 
-import application.SmartCardCommunication;
+import application.main.SmartCardCommunication;
 import application.services.LoginService;
-import events.LoginClick;
+import application.events.LoginClick;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;

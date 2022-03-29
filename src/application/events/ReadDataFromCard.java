@@ -1,6 +1,6 @@
-package events;
+package application.events;
 
-import application.Util;
+import application.main.Util;
 import application.services.ReadDataFromCardService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

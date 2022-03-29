@@ -1,6 +1,6 @@
 package application.services;
 
-import application.SmartCardCommunication;
+import application.main.SmartCardCommunication;
 import application.entity.UserAccountMessage;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;

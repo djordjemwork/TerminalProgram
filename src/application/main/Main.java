@@ -1,6 +1,6 @@
-package application;
+package application.main;
 
-import controllers.LoginController;
+import application.controllers.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
@@ -13,7 +13,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/LoginScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/LoginScene.fxml"));
             Parent root = loader.load();
             Scene loginScene = new Scene(root);
 

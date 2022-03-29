@@ -1,6 +1,6 @@
 package application.services;
 
-import application.SmartCardCommunication;
+import application.main.SmartCardCommunication;
 import application.entity.LoginMessage;
 import application.entity.StatusCode;
 import javafx.concurrent.Service;

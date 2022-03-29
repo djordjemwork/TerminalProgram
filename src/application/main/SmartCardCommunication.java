@@ -1,4 +1,4 @@
-package application;
+package application.main;
 
 import application.exceptions.CardInitException;
 import application.entity.LoginMessage;

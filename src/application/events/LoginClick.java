@@ -1,7 +1,7 @@
-package events;
+package application.events;
 
-import application.CardReader;
-import application.Util;
+import application.main.CardReader;
+import application.main.Util;
 import application.services.LoginService;
 import application.entity.LoginMessage;
 import application.entity.StatusCode;
