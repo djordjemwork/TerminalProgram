@@ -56,7 +56,7 @@ public class LoginClick implements EventHandler<ActionEvent> {
 
     private void switchScene(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../application/fxml/MainScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/MainScene.fxml"));
             Parent mainRoot = (Parent) loader.load();
             Scene mainScene = new Scene(mainRoot);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
